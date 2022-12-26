@@ -38,8 +38,11 @@ Widget::Widget(const WidgetFactory* factory, Window* parent,
 {
   lv_obj_clear_flag(lvobj, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_clear_flag(lvobj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
-
+#if !defined(PCB_WROVER)
   if (dynamic_cast<Topbar*>(parent))
+#else
+  if (parent)
+#endif
     fsAllowed = false;
   
   setPressHandler([&]() -> uint8_t {
@@ -98,7 +101,11 @@ void Widget::onCancel()
 
 void Widget::update()
 {
+#if !defined(PCB_WROVER)
   auto container = dynamic_cast<WidgetsContainer*>(parent);
+#else
+  WidgetsContainer* container = (WidgetsContainer*)(parent);
+#endif
   if (container) {
     container->updateZones();
   }

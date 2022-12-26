@@ -209,7 +209,7 @@ TEST(Conversions, ConversionXLiteFrom23)
 }
 #endif
 
-#if defined(PCBX7) && (STORAGE_CONVERSIONS <= 219)
+#if (defined(PCB_WROVER) || defined(PCBX7)) && (STORAGE_CONVERSIONS <= 219)
 TEST(Conversions, ConversionX7From23)
 {
 #if defined(SDCARD_YAML)

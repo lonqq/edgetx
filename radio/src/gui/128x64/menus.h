@@ -25,7 +25,7 @@
 #include "keys.h"
 #include "common/stdlcd/menus.h"
 
-#if defined(PCBTARANIS)
+#if defined(PCB_WROVER) || defined(PCBTARANIS)
 #define NAVIGATION_LINE_BY_LINE        0x40
 #define IS_LINE_SELECTED(sub, k)       ((sub)==(k) && menuHorizontalPosition < 0)
 #else

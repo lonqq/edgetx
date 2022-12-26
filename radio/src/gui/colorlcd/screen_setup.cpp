@@ -223,7 +223,11 @@ void ScreenSetupPage::build(FormWindow * form)
   auto idx = customScreenIndex;
 
   LayoutChoice::LayoutFactoryGetter getFactory = [idx] () -> const LayoutFactory * {
+#if !defined(PCB_WROVER)
     auto layout = dynamic_cast<Layout*>(customScreens[idx]);
+#else
+    Layout* layout = (Layout*)(customScreens[idx]);
+#endif
     if (!layout) return nullptr;
     return layout->getFactory();
   };
@@ -295,7 +299,11 @@ void ScreenSetupPage::buildLayoutOptions()
   layoutOptions->setFlexLayout();
   
   // Layout options...
+#if !defined(PCB_WROVER)
   auto layout = dynamic_cast<Layout*>(customScreens[customScreenIndex]);
+#else
+    Layout* layout = (Layout*)(customScreens[customScreenIndex]);
+#endif
   if (!layout) return;
 
   auto factory = layout->getFactory();
