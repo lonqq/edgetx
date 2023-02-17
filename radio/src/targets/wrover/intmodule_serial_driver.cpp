@@ -81,7 +81,7 @@ uint32_t get_ardu_serial_config(const etx_serial_init* params) {
 void* intmoduleSerialStart(const etx_serial_init* params)
 {
   if (!params) return nullptr;
-  intmod_uart->begin(params->baudrate, get_ardu_serial_config(params));
+  intmod_uart->begin(params->baudrate, get_ardu_serial_config(params), INTMOD_RX_PIN, INTMOD_TX_PIN);
   return (void*)intmod_uart;
 }
 

@@ -1,11 +1,11 @@
 #include "opentx.h"
 #include "Arduino.h"
 
-const int LEDPin = BACKLITE_PIN;
+const int LEDPin = 21;//BACKLITE_PIN;
 
 int dutyCycle;
 /* Setting PWM Properties */
-const int PWMFreq = 50000; /* 50 KHz to avoid high pitch noise */
+const int PWMFreq = 5000;
 const int PWMChannel = 1;
 const int PWMResolution = 10;
 const int MAX_DUTY_CYCLE = (int)(pow(2, PWMResolution) - 1);

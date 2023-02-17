@@ -269,36 +269,42 @@ void check_telemetry_exti();
 
 /*
 From Kconfig
-  MOSI 12
-  MISO 25
-  SCLK 4
-  LCD CS 27
-  LCD DC 32
-  TOUCH CS 15
-  TOUCH IRQ 33
-  
-From top CMakeLists
-  INTMOD RX/TX 36/26
+  LCD D0 - D7: 11, 12, 13, 14, 21, 47, 48, 45
+  LCD CS 17
+  LCD DC 18
+  LCD WR 8
+
+//  MOSI 14
+//  MISO 48
+//  RESET 10
+//  SCLK 47
+//  TOUCH CS 38
+//  TOUCH IRQ 42
 */
-#define BACKLITE_PIN 0
-#define RMT_TX_PIN 2
-#define TRAINER_IN_GPIO 35
-#define FLYSKY_UART_RX_PIN 39
+#define BACKLITE_PIN 46
+#define RMT_TX_PIN 4 //todo
+#define TRAINER_IN_GPIO 5 // todo
+#define FLYSKY_UART_RX_PIN 6 // todo
 
-#define I2C_SCL 21
-#define I2C_SDA 22
+#define INTMOD_RX_PIN 2 // todo
+#define INTMOD_TX_PIN 1 // todo
 
-#define SD_DEDICATED_SPI
+#define I2C_SCL 15
+#define I2C_SDA 16
+
+// share with touch, so configured in menuconfig
+//#define SD_DEDICATED_SPI
 #ifdef SD_DEDICATED_SPI
-#define SDSPI_CLK 14
-#define SDSPI_MOSI 5
-#define SDSPI_MISO 34
+#define SD_SPI_HOST SPI3_HOST
+#define SDSPI_CLK 0
+#define SDSPI_MOSI 10
+#define SDSPI_MISO 3
 #endif
-#define SDCARD_CS_GPIO 13
+#define SDCARD_CS_GPIO 9
 
-#define I2S_DOUT 18
-#define I2S_BCLK 19
-#define I2S_LRCLK 23
+#define I2S_DOUT 41
+#define I2S_BCLK 40
+#define I2S_LRCLK 39
 
 // Keys driver
 // on Adafruit_MCP23X17

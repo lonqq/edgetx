@@ -25,9 +25,9 @@
 #define ENABLE_SOUND
 
 static uint32_t _sampleRate = AUDIO_SAMPLE_RATE;
+static i2s_port_t snd_port = I2S_NUM_0;
 
 void audioInit() {
-#ifdef ENABLE_SOUND
   static const i2s_config_t i2s_config = {
     .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX),   // The main controller can transmit data but not receive.
     .sample_rate = _sampleRate,
@@ -42,29 +42,23 @@ void audioInit() {
   };
 
   static const i2s_pin_config_t pin_config = {
+    .mck_io_num = I2S_PIN_NO_CHANGE,   // Not used
     .bck_io_num = I2S_BCLK,   // Serial clock (SCK), aka bit clock (BCK)
     .ws_io_num = I2S_LRCLK,   // Word select (WS), i.e. command (channel) select, used to switch between left and right channel data
     .data_out_num = I2S_DOUT,   // Serial data signal (SD), used to transmit audio data in two's complement format
     .data_in_num = I2S_PIN_NO_CHANGE   // Not used
   };
 
-  if (i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL)){
+  if (i2s_driver_install(snd_port, &i2s_config, 0, NULL)){
     TRACE_ERROR("Install and start I2S driver failed !");
-  } else if (i2s_set_pin(I2S_NUM_0, &pin_config)){
+  } else if (i2s_set_pin(snd_port, &pin_config)){
     TRACE_ERROR("Set I2S pin number failed !");
   }
-#endif
 }
 
 static bool inited = false;
 void setSampleRate(uint32_t frequency) {
-  if (!inited) {
-    audioInit();
-    inited = true;
-  }
-#ifdef ENABLE_SOUND
-  i2s_set_sample_rates(I2S_NUM_0, frequency);
-#endif
+  i2s_set_sample_rates(snd_port, frequency);
 }
 
 uint8_t * currentBuffer = nullptr;
@@ -73,10 +67,6 @@ int16_t newVolume = -1;
 
 void audioSetCurrentBuffer(const AudioBuffer * buffer)
 {
-  if (!inited) {
-    audioInit();
-    inited = true;
-  }
   if (buffer) {
     currentBuffer = (uint8_t *)buffer->data;
     currentSize = buffer->size * 2;
@@ -95,7 +85,7 @@ void audioConsumeCurrentBuffer() {
   while (currentBuffer && currentSize) {
     uint32_t written = 0U;
 #ifdef ENABLE_SOUND
-    i2s_write(I2S_NUM_0, currentBuffer, 4, &written, 100);
+    i2s_write(snd_port, currentBuffer, 4, &written, 100);
 #else
     written = currentSize;
 #endif

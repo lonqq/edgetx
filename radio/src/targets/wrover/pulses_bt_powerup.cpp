@@ -45,16 +45,12 @@ static void notifyCallback(
   uint8_t* pData,
   size_t length,
   bool isNotify) {
-    Serial.print("Notify callback for characteristic ");
-    Serial.print(pBLERemoteCharacteristic->getUUID().toString().c_str());
-    Serial.print(" of data length ");
-    Serial.println(length);
-    Serial.print("data: ");
-    Serial.println(*pData);
+    TRACE("Notify callback for characteristic %s of data length %d",
+      pBLERemoteCharacteristic->getUUID().toString().c_str(), length);
 }
 
 static void scanCompleteCB(BLEScanResults result) {
-  Serial.println("Scan completed");
+  TRACE("Scan completed");
 }
 
 class MyClientCallback : public BLEClientCallbacks {
@@ -63,41 +59,39 @@ class MyClientCallback : public BLEClientCallbacks {
 
   void onDisconnect(BLEClient* pclient) {
     connected = false;
-    Serial.println("onDisconnect");
+    TRACE("onDisconnect");
   }
 };
 
 bool connectToServer() {
-    Serial.print("Forming a connection to ");
-    Serial.println(myDevice->getAddress().toString().c_str());
+    TRACE("Forming a connection to %s", myDevice->getAddress().toString().c_str());
     
     BLEClient*  pClient  = BLEDevice::createClient();
-    Serial.println(" - Created client");
+    TRACE(" - Created client");
 
     pClient->setClientCallbacks(new MyClientCallback());
 
     // Connect to the remove BLE Server.
     pClient->connect(myDevice);  // if you pass BLEAdvertisedDevice instead of address, it will be recognized type of peer device address (public or private)
-    Serial.println(" - Connected to server");
+    TRACE(" - Connected to server");
     pClient->setMTU(517); //set client to request maximum MTU from server (default is 23 otherwise)
   
     // Obtain a reference to the service we are after in the remote BLE server.
     BLERemoteService* pPWUService = pClient->getService(PWUserviceUUID);
     BLERemoteService* pBattService = pClient->getService(BATserviceUUID);
     if ((pPWUService == nullptr) || (pBattService == nullptr)) {
-      Serial.print("Failed to find our service UUID: ");
-      Serial.println(PWUserviceUUID.toString().c_str());
+      TRACE("Failed to find our service UUID: %s", PWUserviceUUID.toString().c_str());
       pClient->disconnect();
       return false;
     }
-    Serial.println(" - Found our service");
+    TRACE(" - Found our service");
 
     std::map<std::string, BLERemoteCharacteristic*>* map = pPWUService->getCharacteristics();
 
     std::map<std::string, BLERemoteCharacteristic*>::iterator itr;
-    Serial.println("----- BLERemoteCharacteristic Map: -----");
+    TRACE("----- BLERemoteCharacteristic Map: -----");
     for(itr=map->begin(); itr!=map->end(); itr++) {
-      Serial.printf(" --- %s %s\n", itr->first.c_str(), (char *)itr->second->toString().c_str());
+      TRACE(" --- %s %s", itr->first.c_str(), (char *)itr->second->toString().c_str());
     }
   
     // Obtain a reference to the characteristic in the service of the remote BLE server.
@@ -105,11 +99,11 @@ bool connectToServer() {
     pRudder = pPWUService->getCharacteristic(RDRcharUUID);
     pBattLevel = pBattService->getCharacteristic(BATcharUUID);
     if ((pThrottle == nullptr) || (pRudder == nullptr) || (pBattLevel == nullptr)) {
-      Serial.print("Failed to find our characteristic\n");
+      TRACE("Failed to find our characteristic");
       pClient->disconnect();
       return false;
     }
-    Serial.println(" - Found our characteristic");
+    TRACE(" - Found our characteristic");
 
     if(pBattLevel->canNotify())
       pBattLevel->registerForNotify(notifyCallback);
@@ -125,8 +119,7 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
    * Called for each advertising BLE server.
    */
   void onResult(BLEAdvertisedDevice advertisedDevice) {
-    Serial.print("BLE Advertised Device found: ");
-    Serial.println(advertisedDevice.toString().c_str());
+    TRACE("BLE Advertised Device found: %s", advertisedDevice.toString().c_str());
 
     // We have found a device, let us now see if it contains the service we are looking for.
     if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(PWUserviceUUID)) {
@@ -143,7 +136,7 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 static void* BtPowerUPInit(uint8_t module)
 {
   (void)module;
-  BLEDevice::init("");
+  //BLEDevice::init("");
 
   // Retrieve a Scanner and set the callback we want to use to be informed when we
   // have detected a new device.  Specify that we want active scanning and start the
@@ -178,9 +171,9 @@ static void BtPowerUPSendPulses(void* context)
   // connected we set the connected flag to be true.
   if (doConnect == true) {
     if (connectToServer()) {
-      Serial.println("We are now connected to the BLE Server.");
+      TRACE("We are now connected to the BLE Server.");
     } else {
-      Serial.println("We have failed to connect to the server; there is nothin more we will do.");
+      TRACE("We have failed to connect to the server; there is nothin more we will do.");
     }
     doConnect = false;
   }

@@ -20,6 +20,7 @@
 
 #include "opentx.h"
 #include "Arduino.h"
+#include "Bledevice.h"
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include "lvgl.h"
@@ -75,12 +76,17 @@ void sportUpdatePowerInit()
 #endif
 
 lv_color_t* lcdbuf;
+extern lv_disp_drv_t disp_drv;
 void boardInit()
 {
   initArduino();
 
+  BLEDevice::init("");
+
   disableCore0WDT();
   disableCore1WDT();
+
+  audioInit();
 #if !defined(CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9488)
   lcdbuf = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t) * 2, MALLOC_CAP_DMA);
 #endif
@@ -100,7 +106,7 @@ void boardInit()
   rtcInit();
 
   lv_init();
-  lvgl_driver_init(); // lvgl driver initializes SPI for SD as well.
+  lvgl_driver_init(&disp_drv); // lvgl driver initializes SPI for SD as well.
   sdInit();
 
   keysInit();

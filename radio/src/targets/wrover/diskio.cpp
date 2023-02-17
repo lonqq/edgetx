@@ -171,7 +171,7 @@ void sdInit(void)
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
     };
-    config.slot = VSPI_HOST;
+    config.slot = SD_SPI_HOST;
     spi_bus_initialize((spi_host_device_t)config.slot, &bus_config, SPI_DMA_CH_AUTO);
 #endif
 
