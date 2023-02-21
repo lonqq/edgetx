@@ -69,7 +69,7 @@
   #define DEF_TRAINER_CHANNELS         8
   #define MAX_TRAINER_CHANNELS         16
   #define MAX_TELEMETRY_SENSORS        60
-#elif defined(PCB_WROVER)
+#elif defined(PCB_MUFFIN)
   #define MAX_MODELS                   60
   #define MAX_OUTPUT_CHANNELS          32 // number of real output channels CH1-CH32
   #define MAX_FLIGHT_MODES             9
@@ -115,7 +115,7 @@ enum CurveType {
 #define MIN_POINTS_PER_CURVE           3
 #define MAX_POINTS_PER_CURVE           17
 
-#if defined(PCBHORUS) || defined(PCBNV14) || (defined(PCB_WROVER) && !defined(USE_OLED_FEATHERWING))
+#if defined(PCBHORUS) || defined(PCBNV14) || (defined(PCB_MUFFIN) && !defined(USE_OLED_FEATHERWING))
   #define LEN_MODEL_NAME               15
   #define LEN_TIMER_NAME               8
   #define LEN_FLIGHT_MODE_NAME         10
@@ -152,7 +152,7 @@ enum CurveType {
   #define MAX_CURVE_POINTS             512
 #endif
 
-#if defined(PCB_WROVER) || defined(PCBFRSKY) || defined(PCBNV14)
+#if defined(PCB_MUFFIN) || defined(PCBFRSKY) || defined(PCBNV14)
   #define NUM_MODULES                  2
 #else
   #define NUM_MODULES                  1
@@ -351,7 +351,7 @@ enum TelemetryUnit {
   #define NUM_LINE_ITEMS 2
 #endif
 
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
   #define MAX_TELEM_SCRIPT_INPUTS  8
 #endif
 
@@ -642,7 +642,7 @@ enum MixSources {
   MIXSRC_POT3,                          LUA_EXPORT("s3", "6 POS")
   MIXSRC_FIRST_SLIDER SKIP = MIXSRC_POT3,
   MIXSRC_LAST_POT SKIP = MIXSRC_POT3,
-#elif defined(PCB_WROVER) || defined(PCBX7) || defined(PCBXLITE) || defined(PCBNV14)
+#elif defined(PCB_MUFFIN) || defined(PCBX7) || defined(PCBXLITE) || defined(PCBNV14)
   MIXSRC_POT1 = MIXSRC_FIRST_POT,       LUA_EXPORT("s1", "Potentiometer 1")
   MIXSRC_POT2,                          LUA_EXPORT("s2", "Potentiometer 2")
   MIXSRC_FIRST_SLIDER SKIP = MIXSRC_POT2,

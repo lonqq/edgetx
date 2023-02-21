@@ -19,7 +19,6 @@
  */
 
 #include "opentx.h"
-#include "Arduino.h"
 
 #if defined(AUX_SERIAL)
 
@@ -27,12 +26,9 @@ void auxSerialSetup(unsigned int baudrate, bool dma, uint16_t length, uint16_t p
 {
 }
 
-HardwareSerial &aux_serial = Serial;
-
 static void* aux_serial_init(const etx_serial_init* params)
 {
-  //aux_serial.begin(115200);
-  return (void*)&aux_serial;
+  return NULL;// TODO-v5 (void*)&aux_serial;
 }
 
 static void* auxSerialInit(const etx_serial_init* params)
@@ -42,12 +38,10 @@ static void* auxSerialInit(const etx_serial_init* params)
 
 static void aux_serial_putc(void* ctx, uint8_t c)
 {
-  //aux_serial.print((char)c);
 }
 
 static void aux_serial_send_buffer(void* ctx, const uint8_t* data, uint8_t size)
 {
-  //aux_serial.write(data, size);
 }
 
 static void aux_wait_tx_completed(void* ctx)

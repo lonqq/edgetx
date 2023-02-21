@@ -19,8 +19,7 @@
  */
 
 #include "opentx.h"
-#include "Arduino.h"
-#include "Bledevice.h"
+
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include "lvgl.h"
@@ -30,12 +29,13 @@
 
 #include "lvgl_helpers.h"
 
-#include "Wire.h"
+#include "nvs_flash.h"
+/* BLE */
+#include "nimble/nimble_port.h"
+#include "nimble/nimble_port_freertos.h"
 
 extern void adruino_adc_init(void);
 extern void flysky_hall_stick_init();
-
-HardwareOptions hardwareOptions;
 
 #if defined(__cplusplus)
 extern "C" {
@@ -47,7 +47,7 @@ extern "C" {
 }
 #endif
 
-//HardwareOptions hardwareOptions;
+HardwareOptions hardwareOptions;
 
 void watchdogInit(unsigned int duration)
 {
@@ -79,43 +79,36 @@ lv_color_t* lcdbuf;
 extern lv_disp_drv_t disp_drv;
 void boardInit()
 {
-  initArduino();
+  /* Initialize NVS — it is used to store PHY calibration data */
+  esp_err_t ret = nvs_flash_init();
+  if  (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+      ESP_ERROR_CHECK(nvs_flash_erase());
+      ret = nvs_flash_init();
+  }
+  ESP_ERROR_CHECK(ret);
 
-  BLEDevice::init("");
-
-  disableCore0WDT();
-  disableCore1WDT();
+  nimble_port_init();
 
   audioInit();
 #if !defined(CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9488)
   lcdbuf = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t) * 2, MALLOC_CAP_DMA);
 #endif
 
-  Wire.setPins(I2C_SDA, I2C_SCL);
+  lv_init();
+  lvgl_driver_init(&disp_drv); // lvgl driver initializes I2C_0 as well.
 
-#if defined(DEBUG)
-  serialSetMode(SP_AUX1, UART_MODE_DEBUG);
-  serialInit(SP_AUX1, UART_MODE_DEBUG);
-#endif
-
-  backlightInit();
-
-#if !defined(COLORLCD)
-  lcdInit();
-#endif
+  sdInit();
   rtcInit();
 
-  lv_init();
-  lvgl_driver_init(&disp_drv); // lvgl driver initializes SPI for SD as well.
-  sdInit();
+  backlightInit();
 
   keysInit();
 
   initWiFi();
 
   flysky_hall_stick_init();
-  init5msTimer();
   init2MhzTimer();
+  init5msTimer();
   adruino_adc_init();
 }
 

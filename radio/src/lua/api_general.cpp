@@ -35,8 +35,8 @@
 
 #if defined(PCBX12S)
   #include "lua/lua_exports_x12s.inc"   // this line must be after lua headers
-#elif defined(PCB_WROVER)
-  #include "lua/lua_exports_wrover.inc"   // this line must be after lua headers
+#elif defined(PCB_MUFFIN)
+  #include "lua/lua_exports_muffin.inc"   // this line must be after lua headers
 #elif defined(RADIO_FAMILY_T16)
   #include "lua/lua_exports_t16.inc"
 #elif defined(PCBX10)
@@ -2740,7 +2740,7 @@ const luaR_value_entry opentxConstants[] = {
   { "MIXSRC_SB", MIXSRC_SB },
   { "MIXSRC_SC", MIXSRC_SC },
   { "MIXSRC_SD", MIXSRC_SD },
-#if !(defined(PCB_WROVER) || defined(PCBX7)) && !defined(PCBXLITE) && !defined(PCBX9LITE)
+#if !(defined(PCB_MUFFIN) || defined(PCBX7)) && !defined(PCBXLITE) && !defined(PCBX9LITE)
   { "MIXSRC_SE", MIXSRC_SE },
   { "MIXSRC_SG", MIXSRC_SG },
 #endif

@@ -209,8 +209,8 @@ void onSdManagerMenu(const char * result)
     getSelectionFullPath(lfn);
     pushMenuTextView(lfn);
   }
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
-#if !defined(PCB_WROVER)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
+#if !defined(PCB_MUFFIN)
   else if (result == STR_FLASH_BOOTLOADER) {
     getSelectionFullPath(lfn);
     BootloaderFirmwareUpdate bootloader;
@@ -353,7 +353,7 @@ void menuRadioSdManager(event_t _event)
       REFRESH_FILES();
       break;
 
-#if !(defined(PCB_WROVER) || defined(PCBTARANIS))
+#if !(defined(PCB_MUFFIN) || defined(PCBTARANIS))
     case EVT_KEY_FIRST(KEY_RIGHT):
 #endif
     case EVT_KEY_BREAK(KEY_ENTER):
@@ -427,9 +427,9 @@ void menuRadioSdManager(event_t _event)
             POPUP_MENU_ADD_ITEM(STR_FLASH_EXTERNAL_ELRS);
           }
 #endif
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
           if (!READ_ONLY() && !strcasecmp(ext, FIRMWARE_EXT)) {
-#if !defined(PCB_WROVER)
+#if !defined(PCB_MUFFIN)
             if (isBootloader(lfn)) {
               POPUP_MENU_ADD_ITEM(STR_FLASH_BOOTLOADER);
             }

@@ -22,7 +22,6 @@
 #include "FatFs/diskio.h"
 #include "FatFs/ff.h"
 
-#include "Arduino.h"
 #include "driver/gpio.h"
 #include "soc/soc_caps.h"
 #include "driver/sdmmc_host.h"

@@ -44,7 +44,6 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 #include "esp_system.h"
-#include "esp_spi_flash.h"
 #include "nvs_flash.h"
 #include "esp_event.h"
 //#define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
@@ -71,7 +70,7 @@
 #define ALLOC_PATH_MAX CONFIG_FATFS_MAX_LFN
 
 bool native_vfs_mounted[2] = {true, true};
-extern tcpip_adapter_if_t tcpip_if[MAX_ACTIVE_INTERFACES];
+extern esp_netif_t *tcpip_if[MAX_ACTIVE_INTERFACES];
 
 QueueHandle_t ftp_mutex = NULL;
 uint32_t ftp_stack_size;
@@ -472,21 +471,21 @@ static ftp_result_t ftp_wait_for_connection (int32_t l_sd, int32_t *n_sd, uint32
 
     if (ip_addr) {
         // check on which network interface the client was connected and save the IP address
-        tcpip_adapter_ip_info_t ip_info = {0};
+        esp_netif_ip_info_t ip_info = {0};
         int n_if = network_get_active_interfaces();
-
         if (n_if > 0) {
             struct sockaddr_in clientAddr;
             in_addrSize = sizeof(struct sockaddr_in);
             getpeername(_sd, (struct sockaddr *)&clientAddr, (socklen_t *)&in_addrSize);
             ESP_LOGD(FTP_TAG, "Client IP: %08x", clientAddr.sin_addr.s_addr);
             *ip_addr = 0;
-            for (int i=0; i<n_if; i++) {
-                tcpip_adapter_get_ip_info(tcpip_if[i], &ip_info);
+
+            for (int i=0; i<MAX_ACTIVE_INTERFACES; i++) {
+                esp_netif_get_ip_info(tcpip_if[i], &ip_info);
                 ESP_LOGD(FTP_TAG, "Adapter: %08x, %08x", ip_info.ip.addr, ip_info.netmask.addr);
                 if ((ip_info.ip.addr & ip_info.netmask.addr) == (ip_info.netmask.addr & clientAddr.sin_addr.s_addr)) {
                     *ip_addr = ip_info.ip.addr;
-                    ESP_LOGD(FTP_TAG, "Client connected on interface %d", tcpip_if[i]);
+                    ESP_LOGD(FTP_TAG, "Client connected");
                     break;
                 }
             }

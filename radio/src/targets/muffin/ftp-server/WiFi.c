@@ -21,12 +21,15 @@
 #include "freertos/semphr.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
-#include "esp_event_loop.h"
+#include "esp_event.h"
 #include "esp_log.h"
+#include "esp_mac.h"
 #include "nvs_flash.h"
 #include "ftp.h"
 #include "network.h"
 #include "WiFi.h"
+
+#include <lwip/ip_addr.h>
 
 
 #define DEFAULT_ESP_WIFI_SSID      "EdgeTXWiFi"
@@ -36,7 +39,7 @@
 
 
 static const char *TAG = "WiFi.c";
-tcpip_adapter_if_t tcpip_if[MAX_ACTIVE_INTERFACES];
+esp_netif_t *tcpip_if[MAX_ACTIVE_INTERFACES];
 volatile enum WifiState wifiState=WIFI_IDLE;
 volatile uint32_t expireTimer_ms;
 static int s_retry_num = 0;
@@ -47,21 +50,21 @@ int network_get_active_interfaces()
     int n_if = 0;
 
     for (int i=0; i<MAX_ACTIVE_INTERFACES; i++) {
-        tcpip_if[i] = TCPIP_ADAPTER_IF_MAX;
+        tcpip_if[i] = NULL;
     }
     wifi_mode_t mode;
     esp_err_t ret = esp_wifi_get_mode(&mode);
     if (ret == ESP_OK) {
         if (mode == WIFI_MODE_STA) {
             n_if = 1;
-            tcpip_if[0] = TCPIP_ADAPTER_IF_STA;
+            tcpip_if[0] = esp_netif_create_default_wifi_sta();
         } else if (mode == WIFI_MODE_AP) {
             n_if = 1;
-            tcpip_if[0] = TCPIP_ADAPTER_IF_AP;
+            tcpip_if[0] = esp_netif_create_default_wifi_ap();
         } else if (mode == WIFI_MODE_APSTA) {
             n_if = 2;
-            tcpip_if[0] = TCPIP_ADAPTER_IF_STA;
-            tcpip_if[1] = TCPIP_ADAPTER_IF_AP;
+            tcpip_if[0] = esp_netif_create_default_wifi_sta();
+            tcpip_if[1] = esp_netif_create_default_wifi_ap();
         }
     } else {
         ESP_LOGE(TAG,"esp_wifi_get_mode error: %x", ret);
@@ -71,14 +74,11 @@ int network_get_active_interfaces()
 
 uint32_t network_hasip()
 {
-    tcpip_adapter_ip_info_t ip_info = {0};
-    int n_if = network_get_active_interfaces();
-    if (n_if) {
-        for (int i=0; i<n_if; i++) {
-            tcpip_adapter_get_ip_info(tcpip_if[i], &ip_info);
-            if (ip_info.ip.addr > 0) {
-                return ip_info.ip.addr;
-            }
+    esp_netif_ip_info_t ip_info = {0};
+    for (int i=0; i<MAX_ACTIVE_INTERFACES; i++) {
+        esp_netif_get_ip_info(tcpip_if[i], &ip_info);
+        if (ip_info.ip.addr > 0) {
+            return ip_info.ip.addr;
         }
     }
     return 0;
@@ -173,8 +173,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG,"connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "got ip:%s",
-                 ip4addr_ntoa(&event->ip_info.ip));
+        ESP_LOGI(TAG, "got ip:%s", IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         wifiState = WIFI_CONNECTED;
 //        xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
@@ -236,15 +235,16 @@ void wifi_init_softap()
 
 void init_wifi(){
     //Initialize NVS
+#if 0
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK_WITHOUT_ABORT(nvs_flash_erase());
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK_WITHOUT_ABORT(ret);
-    tcpip_adapter_init();
+#endif
+    esp_netif_init();
     ESP_ERROR_CHECK_WITHOUT_ABORT(esp_event_loop_create_default());
-    ESP_ERROR_CHECK_WITHOUT_ABORT(esp_event_loop_init(event_handler, NULL));
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK_WITHOUT_ABORT(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK_WITHOUT_ABORT(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));

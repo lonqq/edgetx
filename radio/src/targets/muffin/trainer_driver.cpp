@@ -19,25 +19,27 @@
  */
 
 #include "opentx.h"
-#include "Arduino.h"
 #include "esp32_rmt_pulse.h"
 
 static rmt_ctx_t* rmt_send = NULL;
 static rmt_ctx_t* rmt_recv = NULL;
 
-static void ppm_trainer_decode_cb(rmt_ctx_t *ctx, uint32_t *rxdata, size_t rxdata_len)
+static void ppm_trainer_decode_cb(rmt_ctx_t *ctx, rmt_rx_done_event_data_t *rxdata)
 {
     int16_t ppm[MAX_TRAINER_CHANNELS];
-    int channel = rmt_ppm_decode_cb(ctx, rxdata, rxdata_len, ppm);
+    int channel = rmt_ppm_decode_cb(ctx, rxdata->received_symbols, rxdata->num_symbols, ppm);
     if (channel > 0) {
         ppmInputValidityTimer = PPM_IN_VALID_TIMEOUT;
         memcpy(ppmInput, ppm, sizeof(ppm));
     }
 }
 
+static StaticTask_t rx_task_buf;
+EXT_RAM_BSS_ATTR static rmt_ctx_t rxctxbuf;
 void init_trainer_capture()
 {
-    rmt_recv = esp32_rmt_rx_init(TRAINER_IN_GPIO, RMT_MEM_64,
+    rxctxbuf.task_struct = &rx_task_buf;
+    rmt_recv = esp32_rmt_rx_init(&rxctxbuf, TRAINER_IN_GPIO, 64,
             RMT_PPM_IN_TICK_NS,
             ppm_trainer_decode_cb,
             MAX_TRAINER_CHANNELS,
@@ -59,9 +61,12 @@ static size_t esp32_rmt_ppm_encode_cb(rmt_ctx_t *ctx) {
     return count;
 }
 
+static StaticTask_t tx_task_buf;
+EXT_RAM_BSS_ATTR static rmt_ctx_t txctxbuf;
 void init_trainer_ppm()
 {
-    rmt_send = esp32_rmt_tx_init(RMT_TX_PIN, RMT_MEM_64,
+    txctxbuf.task_struct = &tx_task_buf;
+    rmt_send = esp32_rmt_tx_init(&txctxbuf, RMT_TX_PIN, 64,
             RMT_PPM_OUT_TICK_NS,
             esp32_rmt_ppm_encode_cb,
             MAX_TRAINER_CHANNELS + 2); // extra two for idle pulse and termination

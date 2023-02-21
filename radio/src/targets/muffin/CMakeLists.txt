@@ -30,7 +30,7 @@ set(BITMAPS_DIR 480x272)
 set(LCD_DRIVER lcd_lvgl_esp.cpp)
 add_definitions(-DCOLORLCD -DLIBOPENUI -DHARDWARE_TOUCH -DHARDWARE_KEYS)
 add_definitions(-DBATTGRAPH -DTHRTRACE)
-set(BITMAPS_TARGET wrover_bitmaps)
+set(BITMAPS_TARGET muffin_bitmaps)
 set(STORAGE_MODELSLIST YES)
 endif()
 
@@ -46,12 +46,12 @@ option(INTERNAL_MODULE_BT_POWERUP "Support for Bluetooth internal module for POW
 set(FLAVOUR feather)
 set(NAVIGATION_TYPE 9x)
 set(CPU_TYPE ESP32)
-set(LINKER_SCRIPT targets/wrover/ldscript.ld)
+set(LINKER_SCRIPT targets/muffin/ldscript.ld)
 set(FIRMWARE_TARGET_SRC
   ${FIRMWARE_TARGET_SRC}
   )
 set(ROTARY_ENCODER YES)
-set(LUA_EXPORT lua_export_wrover)
+set(LUA_EXPORT lua_export_muffin)
 set(BLUETOOTH NO)
 set(USB_CHARGER YES)
 set(SBUS ON)
@@ -96,6 +96,7 @@ if(INTERNAL_MODULE_BT_POWERUP)
 add_definitions(-DINTERNAL_MODULE_BT_POWERUP)
   set(TARGET_SRC
     ${TARGET_SRC}
+    esp_ble_powerup.c
     pulses_bt_powerup.cpp
     )
 endif()
@@ -156,7 +157,7 @@ endif()
 set(HSE_VALUE 12000000)
 set(SDCARD YES)
 set(EEPROM EEPROM_RAW)
-set(TARGET_DIR wrover)
+set(TARGET_DIR muffin)
 set(PPM_LIMITS_SYMETRICAL YES)
 
 if(SPLASH STREQUAL OFF)
@@ -267,6 +268,7 @@ set(TARGET_SRC
   ${TARGET_SRC}
   ${LED_DRIVER}
   ${AUX_SERIAL_DRIVER}
+  i2c_driver.cpp
   trainer_driver.cpp
   ${LCD_DRIVER}
   haptic_driver.cpp

@@ -333,7 +333,7 @@ void telemetryWakeup()
       audioEvent(AU_SENSOR_LOST);
     }
 
-#if defined(PCB_WROVER) || defined(PCBFRSKY)
+#if defined(PCB_MUFFIN) || defined(PCBFRSKY)
     if (isBadAntennaDetected()) {
       AUDIO_RAS_RED();
       POPUP_WARNING(STR_WARNING, STR_ANTENNAPROBLEM);

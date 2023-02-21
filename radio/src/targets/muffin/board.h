@@ -269,42 +269,45 @@ void check_telemetry_exti();
 
 /*
 From Kconfig
-  LCD D0 - D7: 11, 12, 13, 14, 21, 47, 48, 45
-  LCD CS 17
-  LCD DC 18
-  LCD WR 8
+  LCD D0 - D7: 14, 13, 12, 11, 10, 9, 46, 3
+  LCD CS 48
+  LCD DC 47
+  LCD WR 21
 
-//  MOSI 14
-//  MISO 48
-//  RESET 10
-//  SCLK 47
-//  TOUCH CS 38
-//  TOUCH IRQ 42
+#define I2C_SCL 41
+#define I2C_SDA 38
+
+//  MOSI -1
+//  MISO -1
+//  RESET -1
+//  SCLK -1
+//  TOUCH CS -1
+//  TOUCH IRQ -1
 */
-#define BACKLITE_PIN 46
-#define RMT_TX_PIN 4 //todo
-#define TRAINER_IN_GPIO 5 // todo
-#define FLYSKY_UART_RX_PIN 6 // todo
+#define BACKLITE_PIN 4
+#define RMT_TX_PIN 40
+#define TRAINER_IN_GPIO 39
+#define FLYSKY_UART_RX_PIN 5
 
-#define INTMOD_RX_PIN 2 // todo
-#define INTMOD_TX_PIN 1 // todo
+#define INTMOD_UART_PORT UART_NUM_2
+#define INTMOD_RX_PIN 2
+#define INTMOD_TX_PIN 1
 
-#define I2C_SCL 15
-#define I2C_SDA 16
+#define I2C_MASTER_NUM 0
 
 // share with touch, so configured in menuconfig
-//#define SD_DEDICATED_SPI
+#define SD_DEDICATED_SPI
 #ifdef SD_DEDICATED_SPI
-#define SD_SPI_HOST SPI3_HOST
-#define SDSPI_CLK 0
-#define SDSPI_MOSI 10
-#define SDSPI_MISO 3
+#define SD_SPI_HOST SPI2_HOST
+#define SDSPI_CLK 8
+#define SDSPI_MOSI 17
+#define SDSPI_MISO 18
 #endif
-#define SDCARD_CS_GPIO 9
+#define SDCARD_CS_GPIO 16
 
-#define I2S_DOUT 41
-#define I2S_BCLK 40
-#define I2S_LRCLK 39
+#define I2S_DOUT 6
+#define I2S_BCLK 7
+#define I2S_LRCLK 15
 
 // Keys driver
 // on Adafruit_MCP23X17
@@ -588,7 +591,7 @@ extern uint16_t adcValues[NUM_ANALOGS];
 
 #if defined(PCBXLITE)
   #define BATT_SCALE                    131
-#elif defined(PCB_WROVER) || defined(PCBX7)
+#elif defined(PCB_MUFFIN) || defined(PCBX7)
   #define BATT_SCALE                    123
 #elif defined(PCBX9LITE)
   #define BATT_SCALE                    117
@@ -710,7 +713,7 @@ void telemetryPortInvertedInit(uint32_t baudrate);
 // PCBREV driver
 #if defined(PCBX7ACCESS)
   #define HAS_SPORT_UPDATE_CONNECTOR()  true
-#elif defined(PCB_WROVER) || defined(PCBX7)
+#elif defined(PCB_MUFFIN) || defined(PCBX7)
   #define IS_PCBREV_40()                (hardwareOptions.pcbrev == PCBREV_X7_40)
   #define HAS_SPORT_UPDATE_CONNECTOR()  IS_PCBREV_40()
 #elif defined(SPORT_UPDATE_PWR_GPIO)

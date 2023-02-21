@@ -28,7 +28,7 @@
 #define KEYS_GPIO_PIN_DOWN 1024
 
 // Rotary Encoder
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   //#define ROTARY_ENCODER_NAVIGATION
   #define ROTARY_ENCODER_GPIO              GPIOE
   #define ROTARY_ENCODER_GPIO_PIN_A        GPIO_Pin_9 // PE.9
@@ -55,7 +55,7 @@
 #endif
 
 // Trims
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define TRIMS_GPIO_REG_LHL            GPIOD->IDR
   #define TRIMS_GPIO_PIN_LHL            GPIO_Pin_15 // PD.15
   #define TRIMS_GPIO_REG_LHR            GPIOC->IDR
@@ -75,14 +75,14 @@
 #endif
 
 // Switches
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STORAGE_SWITCH_A
   #define HARDWARE_SWITCH_A
   #define SWITCHES_GPIO_REG_A           GPIOC->IDR
   #define SWITCHES_GPIO_PIN_A           GPIO_Pin_13  // PC.13
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STORAGE_SWITCH_B
   #define HARDWARE_SWITCH_B
   #define SWITCHES_GPIO_REG_B_L         GPIOE->IDR
@@ -91,7 +91,7 @@
   #define SWITCHES_GPIO_PIN_B_H         GPIO_Pin_5  // PA.05
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STORAGE_SWITCH_C
   #define HARDWARE_SWITCH_C
   #define SWITCHES_GPIO_REG_C_L         GPIOE->IDR
@@ -100,42 +100,42 @@
   #define SWITCHES_GPIO_PIN_C_H         GPIO_Pin_11  // PD.11
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STORAGE_SWITCH_D
   #define HARDWARE_SWITCH_D
   #define SWITCHES_GPIO_REG_D           GPIOE->IDR
   #define SWITCHES_GPIO_PIN_D           GPIO_Pin_8  // PE.08
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STORAGE_SWITCH_E
   #define HARDWARE_SWITCH_E
   #define SWITCHES_GPIO_REG_E           GPIOE->IDR
   #define SWITCHES_GPIO_PIN_E           GPIO_Pin_7  // PE.07
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STORAGE_SWITCH_F
   #define HARDWARE_SWITCH_F
   #define SWITCHES_GPIO_REG_F           GPIOE->IDR
   #define SWITCHES_GPIO_PIN_F           GPIO_Pin_1 // PE.01
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STORAGE_SWITCH_G
   #define HARDWARE_SWITCH_G
   #define SWITCHES_GPIO_REG_G           GPIOE->IDR
   #define SWITCHES_GPIO_PIN_G           GPIO_Pin_14 // PE.14
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STORAGE_SWITCH_H
   #define HARDWARE_SWITCH_H
   #define SWITCHES_GPIO_REG_H           GPIOD->IDR
   #define SWITCHES_GPIO_PIN_H           GPIO_Pin_14 // PD.14
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define KEYS_RCC_AHB1Periph           (RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOD|RCC_AHB1Periph_GPIOE)
   #define KEYS_GPIOA_PINS               (KEYS_GPIO_PIN_ENTER | SWITCHES_GPIO_PIN_B_H)
   #define KEYS_GPIOB_PINS               (KEYS_GPIO_PIN_SYS)
@@ -159,7 +159,7 @@
   #define ADC_MAIN_SMPR1               (ADC_SAMPTIME << 0) + (ADC_SAMPTIME << 3) + (ADC_SAMPTIME << 6) + (ADC_SAMPTIME << 9) + (ADC_SAMPTIME << 12) + (ADC_SAMPTIME << 15) + (ADC_SAMPTIME << 18) + (ADC_SAMPTIME << 21) + (ADC_SAMPTIME << 24);
   #define ADC_MAIN_SMPR2               (ADC_SAMPTIME << 0) + (ADC_SAMPTIME << 3) + (ADC_SAMPTIME << 6) + (ADC_SAMPTIME << 9) + (ADC_SAMPTIME << 12) + (ADC_SAMPTIME << 15) + (ADC_SAMPTIME << 18) + (ADC_SAMPTIME << 21) + (ADC_SAMPTIME << 24) + (ADC_SAMPTIME << 27);
 #endif
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define HARDWARE_POT1
   #define HARDWARE_POT2
   #define ADC_RCC_AHB1Periph            (RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_DMA2)
@@ -188,14 +188,14 @@
 // PWR and LED driver
 #define PWR_RCC_AHB1Periph              (RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE)
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define PWR_SWITCH_GPIO               GPIOD
   #define PWR_SWITCH_GPIO_PIN           GPIO_Pin_1  // PD.01
   #define PWR_ON_GPIO                   GPIOD
   #define PWR_ON_GPIO_PIN               GPIO_Pin_0  // PD.00
 #endif
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define STATUS_LEDS
   #define GPIO_LED_GPIO_ON              GPIO_SetBits
   #define GPIO_LED_GPIO_OFF             GPIO_ResetBits
@@ -221,7 +221,7 @@
 #endif
 
 // Internal Module
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define INTMODULE_RCC_APB1Periph      0
   #define INTMODULE_RCC_APB2Periph      RCC_APB2Periph_USART1
   #define INTMODULE_RCC_AHB1Periph      (RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_DMA2)
@@ -247,7 +247,7 @@
 #endif
 
 // External Module
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define EXTMODULE_RCC_APB2Periph      (RCC_APB2Periph_TIM8 | RCC_APB2Periph_USART6)
     #define EXTMODULE_RCC_AHB1Periph    (RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_DMA2)
     #define EXTMODULE_PWR_GPIO          0
@@ -375,7 +375,7 @@
 #define TELEMETRY_EXTI_IRQn             EXTI9_5_IRQn
 #define TELEMETRY_EXTI_TRIGGER          EXTI_Trigger_Rising
 
-#if defined(RADIO_X7) || defined(RADIO_X7ACCESS) || defined(RADIO_TX12) || defined(PCB_WROVER) || defined(RADIO_T8) || defined(RADIO_TPRO)
+#if defined(RADIO_X7) || defined(RADIO_X7ACCESS) || defined(RADIO_TX12) || defined(PCB_MUFFIN) || defined(RADIO_T8) || defined(RADIO_TPRO)
   #define TELEMETRY_EXTI_REUSE_INTERRUPT_ROTARY_ENCODER
 #elif defined(PCBXLITE) || defined(PCBX9LITE) || defined(RADIO_X9DP2019)
   #define TELEMETRY_EXTI_IRQHandler       EXTI9_5_IRQHandler
@@ -401,7 +401,7 @@
 #endif
 
 // S.Port update connector
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   #define SPORT_MAX_BAUDRATE            400000
   #define SPORT_UPDATE_RCC_AHB1Periph   0
 #endif
@@ -469,7 +469,7 @@
 
 // LCD driver
   #define LCD_VERTICAL_INVERT
-#if defined(PCB_WROVER) || defined(PCBX7)
+#if defined(PCB_MUFFIN) || defined(PCBX7)
   #define LCD_RCC_AHB1Periph            (RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_DMA1)
   #define LCD_RCC_APB1Periph            RCC_APB1Periph_SPI3
   #define LCD_SPI_GPIO                  GPIOC
@@ -497,7 +497,7 @@
 #define I2C_RCC_APB1Periph              RCC_APB1Periph_I2C1
 #define I2C                             I2C1
 #define I2C_GPIO_AF                     GPIO_AF_I2C1
-#if defined(PCB_WROVER) || defined(PCBX9LITE)
+#if defined(PCB_MUFFIN) || defined(PCBX9LITE)
   #define I2C_RCC_AHB1Periph            RCC_AHB1Periph_GPIOB
   #define I2C_SPI_GPIO                  GPIOB
   #define I2C_SDA_GPIO_PIN              GPIO_Pin_9  // PB.09

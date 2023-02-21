@@ -30,7 +30,7 @@
 #else
   #define MENUS_STACK_SIZE     8000
 #endif
-#define MIXER_STACK_SIZE       4000
+#define MIXER_STACK_SIZE       8000
 #define AUDIO_STACK_SIZE       8000
 #define CLI_STACK_SIZE         1024  // only consumed with CLI build option
 #if defined(ESP_PLATFORM)

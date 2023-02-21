@@ -49,7 +49,7 @@ static inline void check_yaml_funcs()
   static_assert(offsetof(FlightModeData, gvars) == 22,"");
   check_size<FlightModeData, 40>();
   check_size<CustomFunctionData, 9>();
-#elif defined(PCB_WROVER)
+#elif defined(PCB_MUFFIN)
   //static_assert(offsetof(FlightModeData, gvars) == 18,"");
   //check_size<FlightModeData, 36>();
   //check_size<CustomFunctionData, 11>();
@@ -744,7 +744,7 @@ static void sl_name_read(void* user, uint8_t* data, uint32_t bitoffs,
   uint16_t idx = tw->getElmts(1);
 
   // data / bitoffs already incremented
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
   // Please note:
   //   slidersConfig is defined as a bit-field member,
   //   so let's take the next field and subtract 1
@@ -768,7 +768,7 @@ static bool sl_name_write(void* user, uint8_t* data, uint32_t bitoffs,
   uint16_t idx = tw->getElmts(1);
 
   // data / bitoffs already incremented
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
   // Please note:
   //   slidersConfig is defined as a bit-field member,
   //   so let's take the next field and subtract 1

@@ -54,7 +54,7 @@ safetych_t safetyCh[MAX_OUTPUT_CHANNELS];
 
 // __DMA for the MSC_BOT_Data member
 union ReusableBuffer reusableBuffer __DMA;
-#if !defined(PCB_WROVER)
+#if !defined(PCB_MUFFIN)
 uint8_t* MSC_BOT_Data = reusableBuffer.MSC_BOT_Data;
 #endif
 
@@ -696,7 +696,7 @@ static void checkRTCBattery()
   }
 }
 
-#if defined(PCB_WROVER) || defined(PCBFRSKY) || defined(PCBFLYSKY)
+#if defined(PCB_MUFFIN) || defined(PCBFRSKY) || defined(PCBFLYSKY)
 static void checkFailsafe()
 {
   for (int i=0; i<NUM_MODULES; i++) {
@@ -1824,7 +1824,7 @@ void opentxInit()
 #endif
 
   resetBacklightTimeout();
-#if !defined(PCB_WROVER)
+#if !defined(PCB_MUFFIN)
   startPulses();
 #endif
   WDG_ENABLE(WDG_DURATION);

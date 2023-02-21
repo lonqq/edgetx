@@ -19,7 +19,6 @@
  */
 
 #include "opentx.h"
-#include "Arduino.h"
 #include "esp32_rmt_pulse.h"
 
 typedef struct {

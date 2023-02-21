@@ -84,7 +84,7 @@ ViewMain::ViewMain():
   lv_obj_add_event_cb(lvobj, ViewMain::long_pressed, LV_EVENT_LONG_PRESSED, nullptr);
   
   // create last to be on top
-#if !defined(PCB_WROVER)
+#if !defined(PCB_MUFFIN)
   topbar = dynamic_cast<TopbarImpl*>(TopbarFactory::create(this));
 #else
   topbar = (TopbarImpl*)(TopbarFactory::create(this));

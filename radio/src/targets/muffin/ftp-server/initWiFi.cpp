@@ -23,6 +23,7 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "esp_task.h"
 #define HASASSERT
 #include "opentx.h"
 #include "WiFi.h"
@@ -38,8 +39,8 @@ extern "C" {
 #define OTA_SERVER_STACK_SIZE   0xE00
 #define STA_CONNECT_TMO 10000
 
-EXT_RAM_ATTR StackType_t ftp_task_stack[FTP_SERVER_STACK_SIZE];
-EXT_RAM_ATTR StackType_t ota_task_stack[OTA_SERVER_STACK_SIZE];
+EXT_RAM_BSS_ATTR StackType_t ftp_task_stack[FTP_SERVER_STACK_SIZE];
+EXT_RAM_BSS_ATTR StackType_t ota_task_stack[OTA_SERVER_STACK_SIZE];
 
 static const char *TAG = "initWiFi.cpp";
 TaskHandle_t wifiTaskHandle = NULL;
@@ -173,9 +174,9 @@ const char* getWiFiStatus()
     return "Connecting...";
     break;
   case WIFI_CONNECTED:
-    ip4_addr_t tmp;
+    esp_ip4_addr_t tmp;
     tmp.addr=network_hasip();
-    strcpy(stat,ip4addr_ntoa(&tmp));
+    esp_ip4addr_ntoa(&tmp, stat, sizeof(stat));
     return stat;
     break;
   case WIFI_STOPPING:

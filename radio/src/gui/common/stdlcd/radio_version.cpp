@@ -235,7 +235,7 @@ void menuRadioModulesVersion(event_t event)
 enum MenuRadioVersionItems
 {
   ITEM_RADIO_VERSION_FIRST = HEADER_LINE - 1,
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
   ITEM_RADIO_FIRMWARE_OPTIONS,
 #endif
 #if defined(PXX2)
@@ -255,7 +255,7 @@ void menuRadioVersion(event_t event)
 
   y += 2;
 
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
   lcdDrawText(INDENT_WIDTH, y, EDGETX_BUTTON(TR_FIRMWARE_OPTIONS), menuVerticalPosition == ITEM_RADIO_FIRMWARE_OPTIONS ? INVERS : 0);
   y += FH;
   if (menuVerticalPosition == ITEM_RADIO_FIRMWARE_OPTIONS && event == EVT_KEY_BREAK(KEY_ENTER)) {

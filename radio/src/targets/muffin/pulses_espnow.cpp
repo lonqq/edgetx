@@ -27,6 +27,7 @@
 #include "esp_wifi.h"
 #include "esp_now.h"
 #include "esp_task.h"
+#include "esp_timer.h"
 #include "rom/ets_sys.h"
 #include "rom/crc.h"
 #include "esprc.h"
@@ -227,17 +228,17 @@ static void send_cb(const uint8_t *mac_addr, esp_now_send_status_t status) {
   }
 }
 
-static void recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
+static void recv_cb(const esp_now_recv_info_t * esp_now_info, const uint8_t *data, int len)
 {
     Event_t evt;
 
-    if (mac_addr == NULL || data == NULL || len <= 0) {
+    if (esp_now_info == NULL || data == NULL || len <= 0) {
         ESP_LOGE(TAG, "Receive cb arg error");
         return;
     }
 
     evt.id = RX;
-    memcpy(evt.mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
+    memcpy(evt.mac_addr, esp_now_info->src_addr, ESP_NOW_ETH_ALEN);
     evt.data = (uint8_t *)malloc(len);
     if (evt.data == NULL) {
         ESP_LOGE(TAG, "Malloc receive data fail");

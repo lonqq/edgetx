@@ -31,7 +31,7 @@ struct {
 #endif
 
 #define BIGSIZE       DBLSIZE
-#if defined(PCB_WROVER) || defined (PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined (PCBTARANIS)
   #define LBOX_CENTERX  (LCD_W/4 + 13)
   #define RBOX_CENTERX  (3*LCD_W/4 - 13)
 #else
@@ -288,7 +288,7 @@ void displayBattVoltage()
 #define EVT_KEY_MODEL_MENU             EVT_KEY_FIRST(KEY_MODEL)
 #define EVT_KEY_GENERAL_MENU           EVT_KEY_FIRST(KEY_SYS)
 #define EVT_KEY_TELEMETRY              EVT_KEY_LONG(KEY_PAGEUP)
-#elif defined(PCB_WROVER)
+#elif defined(PCB_MUFFIN)
  #define EVT_KEY_CONTEXT_MENU           EVT_KEY_BREAK(KEY_MENU)
   #define EVT_KEY_PREVIOUS_VIEW          EVT_KEY_BREAK(KEY_UP)
   #define EVT_KEY_NEXT_VIEW              EVT_KEY_BREAK(KEY_DOWN)
@@ -656,7 +656,7 @@ void menuMainView(event_t event)
             drawSwitch(x[i], y[i], sw, 0, false);
           }
         }
-#elif defined(PCB_WROVER) || defined(PCBTARANIS)
+#elif defined(PCB_MUFFIN) || defined(PCBTARANIS)
         uint8_t switches = min(NUM_SWITCHES- NUM_FUNCTIONS_SWITCHES, 6);
         for (int i = 0; i < switches; ++i) {
           if (SWITCH_EXISTS(i)) {

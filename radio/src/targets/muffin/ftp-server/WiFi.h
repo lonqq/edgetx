@@ -16,6 +16,7 @@
 #ifndef _WIFI_H_
 #define _WIFI_H_
 
+#include <esp_timer.h>
 #define STATUS_LEN 32
 #define mp_hal_ticks_ms()  (esp_timer_get_time()/1000)
 #define REBOOT_PATH "/flash/reboot"

@@ -25,7 +25,7 @@
   #include "extmodule_serial_driver.h"
 #endif
 
-#if defined(PCB_WROVER) || defined(PCBFRSKY) || defined(PCBFLYSKY)
+#if defined(PCB_MUFFIN) || defined(PCBFRSKY) || defined(PCBFLYSKY)
 uint8_t switchToMix(uint8_t source)
 {
   div_t qr = div(source-1, 3);
@@ -701,7 +701,7 @@ bool isPxx2IsrmChannelsCountAllowed(int channels)
 
 bool isTrainerUsingModuleBay()
 {
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
   if (TRAINER_MODE_MASTER_SBUS_EXTERNAL_MODULE <= g_model.trainerData.mode && g_model.trainerData.mode <= TRAINER_MODE_MASTER_CPPM_EXTERNAL_MODULE)
     return true;
 #endif
@@ -789,7 +789,7 @@ bool isInternalModuleAvailable(int moduleType)
 
   if (moduleType == MODULE_TYPE_NONE)
     return true;
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   return isInternalModuleSupported(moduleType);
 #else
   if (g_eeGeneral.internalModule != moduleType)
@@ -942,7 +942,7 @@ bool isRfProtocolAvailable(int protocol)
     return false;
   }
 #endif
-#if defined(PCB_WROVER) || defined(PCBTARANIS) || defined(PCBHORUS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS) || defined(PCBHORUS)
   if (protocol != MODULE_SUBTYPE_PXX1_OFF && g_model.moduleData[EXTERNAL_MODULE].type == MODULE_TYPE_R9M_PXX1) {
     return false;
   }
@@ -956,7 +956,7 @@ bool isRfProtocolAvailable(int protocol)
 
 bool isTelemetryProtocolAvailable(int protocol)
 {
-#if defined(PCB_WROVER) || defined(PCBTARANIS)
+#if defined(PCB_MUFFIN) || defined(PCBTARANIS)
   if (protocol == PROTOCOL_TELEMETRY_FRSKY_D_SECONDARY &&
       hasSerialMode(UART_MODE_TELEMETRY) < 0) {
     return false;

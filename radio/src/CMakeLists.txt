@@ -1,11 +1,11 @@
 include(CMakeForceCompiler)
 include(Bitmaps)
 
-set(PCB_TYPES WROVER X9LITE X9LITES X7 XLITE XLITES X9D X9D+ X9E X10 X12S NV14)
+set(PCB_TYPES MUFFIN X9LITE X9LITES X7 XLITE XLITES X9D X9D+ X9E X10 X12S NV14)
 set(RADIO_LANGUAGES CZ DA DE EN ES FI FR IT PT SK SE PL HU NL CN TW JP)
 set(TTS_LANGUAGES CZ DA DE EN ES FR IT PT SK SE PL HU NL RU CN)
 
-set(PCB "WROVER" CACHE STRING "Radio type, one of: ${PCB_TYPES}")
+set(PCB "MUFFIN" CACHE STRING "Radio type, one of: ${PCB_TYPES}")
 set_property(CACHE PCB PROPERTY STRINGS ${PCB_TYPES})
 set(TRANSLATIONS "EN" CACHE STRING "Radio language, one of: ${RADIO_LANGUAGES}")
 set_property(CACHE TRANSLATIONS PROPERTY STRINGS ${RADIO_LANGUAGES})
@@ -93,18 +93,11 @@ set(GVARS_VARIANT   1)
 set(FRSKY_VARIANT   2)
 set(3POS_VARIANT    4)
 
-if(PCB STREQUAL WROVER)
-set(FATFS_SRC
-  ${FATFS_DIR}/ff.c
-  ${FATFS_DIR}/ffunicode.c
-)
-else()
 set(FATFS_SRC
   ${FATFS_DIR}/ff.c
   ${FATFS_DIR}/ffunicode.c
   ${FATFS_DIR}/fattime.c
 )
-endif()
 
 if(PCB STREQUAL X12S OR PCB STREQUAL X10)
   include(targets/horus/CMakeLists.txt)
@@ -112,8 +105,8 @@ elseif(PCB STREQUAL NV14)
   include(targets/nv14/CMakeLists.txt)
 elseif(PCB STREQUAL X9E OR PCB STREQUAL X9D+ OR PCB STREQUAL X9D OR PCB STREQUAL X7 OR PCB STREQUAL X9LITE OR PCB STREQUAL X9LITES OR PCB STREQUAL XLITE OR PCB STREQUAL XLITES)
   include(targets/taranis/CMakeLists.txt)
-elseif(PCB STREQUAL WROVER)
-  include(targets/wrover/CMakeLists.txt)
+elseif(PCB STREQUAL MUFFIN)
+  include(targets/muffin/CMakeLists.txt)
 else()
   message(FATAL_ERROR "Unknown PCB '${PCB}'")
 endif()
@@ -558,7 +551,7 @@ if(ESP_PLATFORM)
     target_link_libraries(tx_firmware stdc++)
     add_dependencies(tx_firmware ${RADIO_DEPENDENCIES} ${FIRMWARE_DEPENDENCIES})
     set_target_properties(tx_firmware PROPERTIES EXCLUDE_FROM_ALL TRUE)
-    target_link_libraries(tx_firmware idf::arduino idf::app_update idf::sdmmc)
+    target_link_libraries(tx_firmware idf::nimble_central_utils idf::lvgl_esp32_drivers idf::lvgl idf::bt idf::esp_timer idf::esp_wifi idf::driver idf::nvs_flash idf::app_update idf::sdmmc)
 else() #ESP_PLATFORM
 
 if(NATIVE_BUILD)

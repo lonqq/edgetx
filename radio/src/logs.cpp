@@ -99,7 +99,7 @@ void initLoggingTimer() {                                       // called cyclic
 
 void writeHeader();
 
-#if defined(PCB_WROVER) || defined(PCBFRSKY) || defined(PCBNV14)
+#if defined(PCB_MUFFIN) || defined(PCBFRSKY) || defined(PCBNV14)
   int getSwitchState(uint8_t swtch) {
     int value = getValue(MIXSRC_FIRST_SWITCH + swtch);
     return (value == 0) ? 0 : (value < 0) ? -1 : +1;
@@ -227,7 +227,7 @@ void writeHeader()
     }
   }
 
-#if defined(PCB_WROVER) || defined(PCBFRSKY) || defined(PCBNV14)
+#if defined(PCB_MUFFIN) || defined(PCBFRSKY) || defined(PCBNV14)
   for (uint8_t i=1; i<NUM_STICKS+NUM_POTS+NUM_SLIDERS+1; i++) {
     const char * p = STR_VSRCRAW[i] + 2;
     size_t len = strlen(p);
@@ -357,7 +357,7 @@ void logsWrite()
         f_printf(&g_oLogFile, "%d,", calibratedAnalogs[i]);
       }
 
-#if defined(PCB_WROVER) || defined(PCBFRSKY) || defined(PCBFLYSKY)
+#if defined(PCB_MUFFIN) || defined(PCBFRSKY) || defined(PCBFLYSKY)
       for (uint8_t i=0; i<NUM_SWITCHES; i++) {
         if (SWITCH_EXISTS(i)) {
           f_printf(&g_oLogFile, "%d,", getSwitchState(i));

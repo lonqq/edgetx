@@ -24,13 +24,13 @@
 #include "timers_driver.h"
 
 RTOS_TASK_HANDLE menusTaskId;
-EXT_RAM_ATTR RTOS_DEFINE_STACK(menusTaskId, menusStack, MENUS_STACK_SIZE);
+EXT_RAM_BSS_ATTR RTOS_DEFINE_STACK(menusTaskId, menusStack, MENUS_STACK_SIZE);
 
 RTOS_TASK_HANDLE mixerTaskId;
 RTOS_DEFINE_STACK(mixerTaskId, mixerStack, MIXER_STACK_SIZE);
 
 RTOS_TASK_HANDLE audioTaskId;
-EXT_RAM_ATTR RTOS_DEFINE_STACK(audioTaskId, audioStack, AUDIO_STACK_SIZE);
+EXT_RAM_BSS_ATTR RTOS_DEFINE_STACK(audioTaskId, audioStack, AUDIO_STACK_SIZE);
 
 RTOS_MUTEX_HANDLE audioMutex;
 RTOS_MUTEX_HANDLE mixerMutex;
@@ -107,7 +107,7 @@ TASK_FUNCTION(mixerTask)
   mixerSchedulerInit();
   mixerSchedulerStart();
 
-#if defined(PCB_WROVER)
+#if defined(PCB_MUFFIN)
   startPulses();
 #endif
 

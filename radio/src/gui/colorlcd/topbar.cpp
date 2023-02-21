@@ -48,7 +48,7 @@ SetupTopBarWidgetsPage::SetupTopBarWidgetsPage():
   // adopt the dimensions of the main view
   setRect(viewMain->getRect());
 
-#if !defined(PCB_WROVER)
+#if !defined(PCB_MUFFIN)
   auto topbar = dynamic_cast<TopbarImpl*>(viewMain->getTopbar());
 #else
   TopbarImpl* topbar = (TopbarImpl*)(viewMain->getTopbar());
