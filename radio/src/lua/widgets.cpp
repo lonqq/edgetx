@@ -383,11 +383,7 @@ void luaUnregisterWidgets()
 {
   std::list<const WidgetFactory *> regWidgets(getRegisteredWidgets());
   for (auto w : regWidgets) {
-#if !defined(PCB_MUFFIN)
     if (dynamic_cast<const LuaWidgetFactory*>(w)) {
-#else
-    if (w) {
-#endif
       delete w;
     }
   }

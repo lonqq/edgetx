@@ -46,10 +46,13 @@
 
 /* ============== end chip definitions ==================== */
 
-#define MCP0_ADDR MCP23XXX_ADDR
+#define MCP0_ADDR (MCP23XXX_ADDR)
 #define MCP1_ADDR (MCP23XXX_ADDR + 1)
 
+#define INTMOD_PWREN_BIT (0x80U)
+
 #define MCP1_SWITCHES_MASK 0xF8U
+#define MCP1_KEYS_MASK 0x7U
 #define MCP1_TRIM_MASK 0xFFU
 
 static uint8_t mcp1_trim = 0U;
@@ -66,8 +69,8 @@ static uint8_t switches = 0U;
 #define MCP1_SW_PIN_A 0x80
 #define MCP1_SW_PIN_B 0x40
 #define MCP1_SW_PIN_D 0x20
-#define MCP1_SW_PIN_C_H 0x08
-#define MCP1_SW_PIN_C_L 0x10
+#define MCP1_SW_PIN_C_L 0x08
+#define MCP1_SW_PIN_C_H 0x10
 
 #define ADD_INV_2POS_CASE(x) \
   case SW_S ## x ## 0: \
@@ -119,6 +122,42 @@ static uint8_t switches = 0U;
 static bool mcp0_exist = false;
 static bool mcp1_exist = false;
 static RTOS_MUTEX_HANDLE keyMutex;
+
+#define PWR_BTN_BIT 0x80
+#define PWR_OFF_BIT 0x40
+#define PWR_BTN_DOWN_AT_START 1
+#define PWR_BTN_RELEASED_AT_START 2
+#define PWR_BTN_DOWN 3
+#define PWR_BTN_RELEASED_AFTER_DOWN 4
+static int pwr_btn_state = 0;
+
+static void process_pwr_btn_state(bool btn_down) {
+    switch (pwr_btn_state) {
+      case 0:
+        if (btn_down) {
+          pwr_btn_state = PWR_BTN_DOWN_AT_START;
+        } else {
+          pwr_btn_state = PWR_BTN_RELEASED_AT_START;
+        }
+        break;
+      case PWR_BTN_DOWN_AT_START:
+        if (!btn_down) {
+          pwr_btn_state = PWR_BTN_RELEASED_AT_START;
+        }
+        break;
+      case PWR_BTN_RELEASED_AT_START:
+        if (btn_down) {
+          pwr_btn_state = PWR_BTN_DOWN;
+        }
+        break;
+      case PWR_BTN_DOWN:
+        if (!btn_down) {
+          pwr_btn_state = PWR_BTN_RELEASED_AFTER_DOWN;
+        }
+        break;
+    }
+}
+
 uint32_t readKeys()
 {
   uint32_t result = 0;
@@ -129,11 +168,14 @@ uint32_t readKeys()
   if (mcp0_exist) {
     i2c_register_read(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 0), gpioAB, sizeof(gpioAB));
     result |= (gpioAB[0] ^ mask) & mask;
+    process_pwr_btn_state(0 != (gpioAB[0] & PWR_BTN_BIT));
   }
   if (mcp1_exist) {
     i2c_register_read(MCP1_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 0), gpioAB, sizeof(gpioAB));
     mcp1_trim = (gpioAB[0] & MCP1_TRIM_MASK) ^ MCP1_TRIM_MASK;
     switches = (gpioAB[1] & MCP1_SWITCHES_MASK) ^ MCP1_SWITCHES_MASK;
+
+    result |= (((gpioAB[1] ^ MCP1_KEYS_MASK) & MCP1_KEYS_MASK) << (BUTTONS_ON_GPIOA + 1));
   }
   RTOS_UNLOCK_MUTEX(keyMutex);
 
@@ -188,7 +230,7 @@ uint32_t switchState(uint8_t index)
   switch (index) {
     ADD_INV_2POS_CASE(A);
     ADD_INV_2POS_CASE(B);
-    ADD_3POS_CASE(C, 2);
+    ADD_INV_3POS_CASE(C, 2);
     ADD_INV_2POS_CASE(D);
   }
 
@@ -205,9 +247,12 @@ void keysInit()
   ret = i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPPU, 0), (1 << BUTTONS_ON_GPIOA) - 1);
   if (0 == ret) {
     mcp0_exist = true;
-    // pin direction
     ret = i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPPU, 0), (1 << BUTTONS_ON_GPIOA) - 1); // TODO: for some reason need to set pull up twice?
-    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_IODIR, 0), (1 << BUTTONS_ON_GPIOA) - 1);
+    // pin direction
+    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_IODIR, 0), 0xFF); // all input by default
+
+    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_IODIR, 1), (uint8_t)((~INTMOD_PWREN_BIT) & 0xFF));
+    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 1), 0x00U);
   }
 
   // pull up
@@ -215,20 +260,42 @@ void keysInit()
   if (0 == ret) {
     mcp1_exist = true;
     ret = i2c_register_write_byte(MCP1_ADDR, MCP_REG_ADDR(MCP23XXX_GPPU, 0), MCP1_TRIM_MASK); // TODO: for some reason need to set pull up twice?
-    i2c_register_write_byte(MCP1_ADDR, MCP_REG_ADDR(MCP23XXX_GPPU, 1), MCP1_SWITCHES_MASK);
+    i2c_register_write_byte(MCP1_ADDR, MCP_REG_ADDR(MCP23XXX_GPPU, 1), MCP1_SWITCHES_MASK | MCP1_KEYS_MASK);
 
     // pin direction
-    i2c_register_write_byte(MCP1_ADDR, MCP_REG_ADDR(MCP23XXX_IODIR, 0), MCP1_TRIM_MASK);
-    i2c_register_write_byte(MCP1_ADDR, MCP_REG_ADDR(MCP23XXX_IODIR, 1), MCP1_SWITCHES_MASK);
+    i2c_register_write_byte(MCP1_ADDR, MCP_REG_ADDR(MCP23XXX_IODIR, 0), 0xFF); // all input by default
+    i2c_register_write_byte(MCP1_ADDR, MCP_REG_ADDR(MCP23XXX_IODIR, 1), 0xFF); // all input by default
   }
 }
 
 void INTERNAL_MODULE_ON(void) {
-
+    uint8_t gpioB[1] = {0};
+    i2c_register_read(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 1), gpioB, sizeof(gpioB));
+    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 1), gpioB[0] | INTMOD_PWREN_BIT);
 }
 void INTERNAL_MODULE_OFF(void) {
+    uint8_t gpioB[1] = {0};
+    i2c_register_read(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 1), gpioB, sizeof(gpioB));
+    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 1), gpioB[0] & ~INTMOD_PWREN_BIT);
 }
 
 bool IS_INTERNAL_MODULE_ON(void) {
-  return false;
+    uint8_t gpioB[1] = {0};
+    i2c_register_read(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 1), gpioB, sizeof(gpioB));
+    return (0 != (gpioB[0] & INTMOD_PWREN_BIT));
+}
+
+void pwrOff()
+{
+    TRACE("Power off");
+    RTOS_WAIT_MS(200);
+    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 1), PWR_OFF_BIT); // keep pwr on but make int module off first
+    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_IODIR, 1), (uint8_t)((~(INTMOD_PWREN_BIT | PWR_OFF_BIT)) & 0xFF));
+    i2c_register_write_byte(MCP0_ADDR, MCP_REG_ADDR(MCP23XXX_GPIO, 1), 0); // Power off
+    while (1) RTOS_WAIT_MS(20); // should never return
+}
+
+bool pwrPressed()
+{
+  return (pwr_btn_state != PWR_BTN_RELEASED_AFTER_DOWN);
 }

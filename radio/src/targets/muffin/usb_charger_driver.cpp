@@ -36,7 +36,7 @@ void usbChargerInit()
 bool usbChargerLed()
 {
 #if 1 // #if 0 // TODO-feather defined(SIMU)
-  return true;
+  return false;
 #else
   return (GPIO_ReadInputDataBit(USB_CHARGER_GPIO, USB_CHARGER_GPIO_PIN) == Bit_RESET && usbPlugged());
 #endif

@@ -268,6 +268,8 @@ set(TARGET_SRC
   ${TARGET_SRC}
   ${LED_DRIVER}
   ${AUX_SERIAL_DRIVER}
+  top_lcd_driver.cpp
+  sh1107.cpp
   i2c_driver.cpp
   trainer_driver.cpp
   ${LCD_DRIVER}

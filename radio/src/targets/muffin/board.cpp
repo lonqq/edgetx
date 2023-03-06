@@ -75,6 +75,26 @@ void sportUpdatePowerInit()
 }
 #endif
 
+// just to keep a reference of the layout so they do not get optimized out by compiler.
+extern LayoutFactory Layout1P2;
+extern LayoutFactory Layout1P3;
+extern LayoutFactory layout1x1;
+extern LayoutFactory Layout1x2;
+extern LayoutFactory Layout1x3;
+extern LayoutFactory Layout1x4;
+extern LayoutFactory layout2P1;
+extern LayoutFactory Layout2P3;
+extern LayoutFactory Layout2x1;
+extern LayoutFactory layout2x2;
+extern LayoutFactory layout2x3;
+extern LayoutFactory layout2x4;
+extern LayoutFactory layout4P2;
+LayoutFactory *layouts[20] = {
+  &Layout1P2, &Layout1P3, &layout1x1, &Layout1x2, &Layout1x3, &Layout1x4,
+  &layout2P1, &Layout2P3, &Layout2x1, &layout2x2, &layout2x3, &layout2x4,
+  &layout4P2
+};
+
 lv_color_t* lcdbuf;
 extern lv_disp_drv_t disp_drv;
 void boardInit()
@@ -97,12 +117,12 @@ void boardInit()
   lv_init();
   lvgl_driver_init(&disp_drv); // lvgl driver initializes I2C_0 as well.
 
+  keysInit();
+
   sdInit();
   rtcInit();
 
   backlightInit();
-
-  keysInit();
 
   initWiFi();
 
@@ -110,11 +130,13 @@ void boardInit()
   init2MhzTimer();
   init5msTimer();
   adruino_adc_init();
+
+  toplcdInit();
 }
 
 void boardOff()
 {
-  // this function must not return!
+  pwrOff();
 }
 
 #if defined(AUDIO_SPEAKER_ENABLE_GPIO)

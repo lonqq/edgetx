@@ -48,6 +48,9 @@ void mixerSchedulerStart()
         .clk_src = GPTIMER_CLK_SRC_DEFAULT,
         .direction = GPTIMER_COUNT_UP,
         .resolution_hz = 1000000, // 1MHz, 1 tick=1us
+        .flags = {
+            .intr_shared = true,
+        }
     };
     ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &mixer_timer));
 

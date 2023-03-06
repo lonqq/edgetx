@@ -270,12 +270,12 @@ void check_telemetry_exti();
 /*
 From Kconfig
   LCD D0 - D7: 14, 13, 12, 11, 10, 9, 46, 3
-  LCD CS 48
-  LCD DC 47
+  LCD CS 45
+  LCD DC 48
   LCD WR 21
 
-#define I2C_SCL 41
-#define I2C_SDA 38
+#define I2C_SCL 40
+#define I2C_SDA 39
 
 //  MOSI -1
 //  MISO -1
@@ -284,10 +284,15 @@ From Kconfig
 //  TOUCH CS -1
 //  TOUCH IRQ -1
 */
+
+#define POT1_ADC_CHANNEL ADC_CHANNEL_5  // GPIO 6
+#define POT2_ADC_CHANNEL ADC_CHANNEL_4  // GPIO 5
+#define BATT_ADC_CHANNEL ADC_CHANNEL_6  // GPIO 7
+
 #define BACKLITE_PIN 4
-#define RMT_TX_PIN 40
-#define TRAINER_IN_GPIO 39
-#define FLYSKY_UART_RX_PIN 5
+#define RMT_TX_PIN 41
+#define TRAINER_IN_GPIO 42
+#define FLYSKY_UART_RX_PIN 44
 
 #define INTMOD_UART_PORT UART_NUM_2
 #define INTMOD_RX_PIN 2
@@ -295,34 +300,35 @@ From Kconfig
 
 #define I2C_MASTER_NUM 0
 
-// share with touch, so configured in menuconfig
 #define SD_DEDICATED_SPI
 #ifdef SD_DEDICATED_SPI
 #define SD_SPI_HOST SPI2_HOST
-#define SDSPI_CLK 8
-#define SDSPI_MOSI 17
-#define SDSPI_MISO 18
+#define SDSPI_CLK 47
+#define SDSPI_MOSI 0
+#define SDSPI_MISO 15
 #endif
-#define SDCARD_CS_GPIO 16
+#define SDCARD_CS_GPIO 38
 
-#define I2S_DOUT 6
-#define I2S_BCLK 7
-#define I2S_LRCLK 15
+#define I2S_DOUT 18
+#define I2S_BCLK 17
+#define I2S_LRCLK 16
 
 // Keys driver
 // on Adafruit_MCP23X17
 enum EnumKeys
 {
+  KEY_ENTER,
+  KEY_MENU = KEY_ENTER,
+  KEY_EXIT,
   KEY_UP,   // must match the order of the button above
   KEY_PLUS = KEY_UP,
   KEY_DOWN,
   KEY_MINUS = KEY_DOWN,
+  BUTTONS_ON_GPIOA = KEY_DOWN,
   KEY_RIGHT,
-  KEY_ENTER,
-  KEY_MENU = KEY_ENTER,
-  KEY_EXIT,
-  BUTTONS_ON_GPIOA,
-  KEY_LEFT = BUTTONS_ON_GPIOA,
+  KEY_LEFT,
+  KEY_RADIO,
+  BUTTONS_ON_MCP1 = KEY_RADIO,
   KEY_BIND,
   KEY_TELEM,
 
@@ -897,7 +903,6 @@ void lcdSetRefVolt(unsigned char val);
 void lcdSetContrast(bool useDefault = false);
 
 // Top LCD driver
-#if defined(TOPLCD_GPIO)
 void toplcdInit();
 void toplcdOff();
 void toplcdRefreshStart();
@@ -907,7 +912,6 @@ void setTopSecondTimer(uint32_t value);
 void setTopRssi(uint32_t rssi);
 void setTopBatteryState(int state, uint8_t blinking);
 void setTopBatteryValue(uint32_t volts);
-#endif
 
 #define USART_FLAG_ERRORS (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)
 

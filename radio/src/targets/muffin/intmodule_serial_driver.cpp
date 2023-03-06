@@ -68,7 +68,7 @@ void* intmoduleSerialStart(const etx_serial_init* params)
   get_serial_config(params, &uart_config);
 
   // We won't use a buffer for sending data.
-  uart_driver_install(INTMOD_UART_PORT, INTMODULE_FIFO_SIZE, 0, 0, NULL, 0);
+  uart_driver_install(INTMOD_UART_PORT, INTMODULE_FIFO_SIZE, 0, 0, NULL, ESP_INTR_FLAG_SHARED);
   uart_param_config(INTMOD_UART_PORT, &uart_config);
   uart_set_pin(INTMOD_UART_PORT, INTMOD_TX_PIN, INTMOD_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 

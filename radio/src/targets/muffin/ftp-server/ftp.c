@@ -305,6 +305,7 @@ static int ftp_get_eplf_item (char *dest, uint32_t destsize, FILINFO *fno)
         buf.st_mtime = 946684800; // Jan 1, 2000
     } else {
         buf.st_size = fino.fsize;
+        buf.st_mtime = fino.ftime;
     }
 
     char str_time[64];
@@ -483,7 +484,7 @@ static ftp_result_t ftp_wait_for_connection (int32_t l_sd, int32_t *n_sd, uint32
             for (int i=0; i<MAX_ACTIVE_INTERFACES; i++) {
                 esp_netif_get_ip_info(tcpip_if[i], &ip_info);
                 ESP_LOGD(FTP_TAG, "Adapter: %08x, %08x", ip_info.ip.addr, ip_info.netmask.addr);
-                if ((ip_info.ip.addr & ip_info.netmask.addr) == (ip_info.netmask.addr & clientAddr.sin_addr.s_addr)) {
+                if ((0 != ip_info.ip.addr) && (ip_info.ip.addr & ip_info.netmask.addr) == (ip_info.netmask.addr & clientAddr.sin_addr.s_addr)) {
                     *ip_addr = ip_info.ip.addr;
                     ESP_LOGD(FTP_TAG, "Client connected");
                     break;

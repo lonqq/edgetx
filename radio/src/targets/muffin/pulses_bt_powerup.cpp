@@ -27,10 +27,22 @@ extern "C" {
   void ble_write_pwrup_thottle(uint8_t data);
   void ble_write_pwrup_rudder(int8_t data);
   void esp_end_ble(void);
+  void task_pwrup(void * pdata);
+  extern TaskHandle_t pwrup_task_handle;
 }
 
+#define TASKPWRUP_STACK_SIZE (1024 * 4)
+#define TASKPWRUP_PRIO 5
+
+static RTOS_TASK_HANDLE taskIdPWRUP;
+EXT_RAM_BSS_ATTR RTOS_DEFINE_STACK(taskIdPWRUP, taskPWRUP_stack, TASKPWRUP_STACK_SIZE);
 static void* BtPowerUPInit(uint8_t module)
 {
+  if (NULL == pwrup_task_handle) {
+    RTOS_CREATE_TASK_EX(taskIdPWRUP,task_pwrup,"PowerUP task",taskPWRUP_stack,TASKPWRUP_STACK_SIZE,TASKPWRUP_PRIO,MENU_TASK_CORE);
+    pwrup_task_handle = taskIdPWRUP.rtos_handle;
+  }
+
   esp_start_ble_scan();
   return (void *)1;
 }
@@ -56,7 +68,6 @@ static void BtPowerUPSendPulses(void* context)
       (int8_t)(channelOutputs[RDR_STICK_CHANNEL] * 127 / STICK_MIN_VALUE);
     
   static uint32_t thrTick = 0;
-  static uint32_t rdrTick = 0;
 
   uint32_t now = RTOS_GET_MS();
   if (prevThr != thr) {
@@ -76,18 +87,6 @@ static void BtPowerUPSendPulses(void* context)
   if (prevRdr != rdr) {
     prevRdr = rdr;
     ble_write_pwrup_rudder(rdr);
-  } else {
-    // TODO: seems the module would power down motor if the value was not sent or changed for a while. So do some kind of dithering here
-    if (now - rdrTick > 1000) {
-      if (127 == rdr) {
-        ble_write_pwrup_rudder(rdr + ((esp_random() > (UINT32_MAX / 2)) ? 0 : -1));
-      } else if (-128 == rdr) {
-        ble_write_pwrup_rudder(rdr + ((esp_random() > (UINT32_MAX / 2)) ? 1 : 0));
-      } else if (2 < abs(rdr)) {
-        ble_write_pwrup_rudder(rdr + ((esp_random() > (UINT32_MAX / 2)) ? 1 : -1));
-      }
-      rdrTick = now;
-    }
   }
 }
 

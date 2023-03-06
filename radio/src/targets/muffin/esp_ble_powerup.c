@@ -23,6 +23,11 @@ struct ble_hs_cfg;
 union ble_store_value;
 union ble_store_key;
 
+TaskHandle_t pwrup_task_handle = NULL;
+
+static SemaphoreHandle_t mutex_handle = NULL;
+static StaticSemaphore_t mutex_struct;
+
 #define TAG "POWERUP"
 static ble_uuid128_t PwrUpUUID = BLE_UUID128_INIT(
     0xD6, 0x8C, 0x76, 0x00, 0xB3, 0x26, 0x17, 0xA1, 0xD9, 0x40,
@@ -48,18 +53,49 @@ static int blecent_gap_event(struct ble_gap_event *event, void *arg);
 
 void ble_store_config_init(void);
 
+static uint8_t current_thr = 0U;
+static int8_t current_rdr = 0U;
+
+static int
+pwrup_on_write(uint16_t conn_handle, const struct ble_gatt_error *error,
+                 struct ble_gatt_attr *attr, void *arg)
+{
+    xTaskNotifyGive(pwrup_task_handle);
+    return 0;
+}
+
 void ble_write_pwrup_thottle(uint8_t data) {
-    if ((NULL != g_pwrup) && (NULL != thr)) {
-        ble_gattc_write_flat(g_pwrup->conn_handle, thr->chr.val_handle, &data, 1, NULL, NULL);
-    }
+    current_thr = data;
 }
 
 void ble_write_pwrup_rudder(int8_t data) {
-    if ((NULL != g_pwrup) && (NULL != rdr)) {
-        ble_gattc_write_flat(g_pwrup->conn_handle, rdr->chr.val_handle, &data, 1, NULL, NULL);
-    }
+    current_rdr = data;
 }
 
+void task_pwrup(void * pdata) {
+    int next_send = 0;
+
+    while(1) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+        xSemaphoreTake(mutex_handle, portMAX_DELAY);
+        switch (next_send) {
+        case 0:
+            next_send = 1;
+            if ((NULL != g_pwrup) && (NULL != thr)) {
+                ble_gattc_write_flat(g_pwrup->conn_handle, thr->chr.val_handle, &current_thr, 1, pwrup_on_write, NULL);
+            }
+            break;
+        case 1:
+            next_send = 0;
+            if ((NULL != g_pwrup) && (NULL != rdr)) {
+                ble_gattc_write_flat(g_pwrup->conn_handle, rdr->chr.val_handle, &current_rdr, 1, pwrup_on_write, NULL);
+            }
+            break;
+        }
+        xSemaphoreGive(mutex_handle);
+    }
+}
 /**
  * Called when service discovery of the specified peer has completed.
  */
@@ -87,6 +123,8 @@ blecent_on_disc_complete(const struct peer *peer, int status, void *arg)
         thr = NULL;
         rdr = NULL;
         return;
+    } else {
+        xTaskNotifyGive(pwrup_task_handle);
     }
     /* Service discovery has completed successfully.  Now we have a complete
      * list of services, characteristics, and descriptors that the peer
@@ -298,9 +336,11 @@ blecent_gap_event(struct ble_gap_event *event, void *arg)
 
     case BLE_GAP_EVENT_DISCONNECT:
         /* Connection terminated. */
+        xSemaphoreTake(mutex_handle, portMAX_DELAY);
         g_pwrup = NULL;
         thr = NULL;
         rdr = NULL;
+        xSemaphoreGive(mutex_handle);
         ESP_LOGI(TAG, "disconnect; reason=%d ", event->disconnect.reason);
         print_conn_desc(&event->disconnect.conn);
         ESP_LOGI(TAG, "\n");
@@ -360,6 +400,11 @@ esp_start_ble_scan(void)
     g_pwrup = NULL;
     thr = NULL;
     rdr = NULL;
+
+    if (NULL == mutex_handle) {
+        mutex_handle = xSemaphoreCreateBinaryStatic(&mutex_struct);
+        xSemaphoreGive(mutex_handle);
+    }
 
     /* Configure the host. */
     ble_hs_cfg.reset_cb = blecent_on_reset;

@@ -551,7 +551,7 @@ if(ESP_PLATFORM)
     target_link_libraries(tx_firmware stdc++)
     add_dependencies(tx_firmware ${RADIO_DEPENDENCIES} ${FIRMWARE_DEPENDENCIES})
     set_target_properties(tx_firmware PROPERTIES EXCLUDE_FROM_ALL TRUE)
-    target_link_libraries(tx_firmware idf::nimble_central_utils idf::lvgl_esp32_drivers idf::lvgl idf::bt idf::esp_timer idf::esp_wifi idf::driver idf::nvs_flash idf::app_update idf::sdmmc)
+    target_link_libraries(tx_firmware idf::esp_adc idf::nimble_central_utils idf::lvgl_esp32_drivers idf::lvgl idf::bt idf::esp_timer idf::esp_wifi idf::driver idf::nvs_flash idf::app_update idf::sdmmc)
 else() #ESP_PLATFORM
 
 if(NATIVE_BUILD)

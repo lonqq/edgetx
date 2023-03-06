@@ -93,6 +93,9 @@ void init5msTimer()
         .clk_src = GPTIMER_CLK_SRC_DEFAULT,
         .direction = GPTIMER_COUNT_UP,
         .resolution_hz = 1000000, // 1MHz, 1 tick=1us
+        .flags = {
+            .intr_shared = true,
+        }
     };
     ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &MyTim5ms));
 
@@ -104,7 +107,7 @@ void init5msTimer()
     ESP_ERROR_CHECK(gptimer_enable(MyTim5ms));
 
     gptimer_alarm_config_t alarm_config = {
-        .alarm_count = 500, // period = 5ms
+        .alarm_count = 5000, // period = 5ms
         .reload_count = 0,
         .flags = {
             .auto_reload_on_alarm = true,

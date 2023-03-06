@@ -130,9 +130,6 @@ void startWiFi( char *ssid_zchar, char *passwd_zchar, char* ftppass_zchar)
     strncpy(ssid,ssid_zchar,sizeof(g_eeGeneral.wifi_ssid));
     strncpy(passwd,passwd_zchar,sizeof(g_eeGeneral.wifi_password));
     strncpy(ftp_pass,ftppass_zchar,sizeof(g_eeGeneral.ftppass));
-    ESP_LOGW(TAG,"ssid: '%s'",ssid);
-    ESP_LOGW(TAG,"passwd: '%s'",passwd);
-    ESP_LOGW(TAG,"ftppasswd: '%s'",ftp_pass);
   }
   wifiTaskHandle = xTaskCreateStaticPinnedToCore( wifiTask, "WiFiTask", FTP_SERVER_STACK_SIZE, NULL,
       ESP_TASK_PRIO_MAX - 4, ftp_task_stack, &wifiTaskBuffer, FTP_SERVER_TASK_CORE );

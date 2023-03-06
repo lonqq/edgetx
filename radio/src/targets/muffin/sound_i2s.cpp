@@ -33,7 +33,7 @@ void audioInit() {
 
     i2s_std_config_t tx_std_cfg = {
         .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(_sampleRate),
-        .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO),
+        .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
         .gpio_cfg = {
             .mclk = I2S_GPIO_UNUSED,    // some codecs may require mclk signal, this example doesn't need it
             .bclk = (gpio_num_t)I2S_BCLK,
@@ -75,15 +75,25 @@ void audioSetCurrentBuffer(const AudioBuffer * buffer)
   }
 }
 
+
+EXT_RAM_BSS_ATTR static uint8_t zero[2048] = {0};
+
 void audioConsumeCurrentBuffer() {
   if (!currentBuffer) {
     audioSetCurrentBuffer(audioQueue.buffersFifo.getNextFilledBuffer());
   }
 
+  static size_t last = 0U;
+  if ((NULL == currentBuffer) && (0U != last)) {
+    size_t written = 0U;
+    i2s_channel_write(tx_chan, zero, last * 2, &written, 1000); // TODO: to mute the speaker? Not sure why after tone playing the speaker keeps having noise even if not writing to the I2S
+    last = 0U;
+  }
   while (currentBuffer && currentSize) {
     size_t written = 0U;
 #ifdef ENABLE_SOUND
-    i2s_channel_write(tx_chan, currentBuffer, currentSize, &written, 5000); 
+    i2s_channel_write(tx_chan, currentBuffer, currentSize, &written, 1000);
+    last = written;
 #else
     written = currentSize;
 #endif

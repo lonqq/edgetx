@@ -28,21 +28,12 @@ void pwrOn()
 {
 }
 
-void pwrOff()
-{
-}
-
 #if defined(PWR_EXTRA_SWITCH_GPIO)
 bool pwrForcePressed()
 {
   return false;
 }
 #endif
-
-bool pwrPressed()
-{
-  return true;
-}
 
 void pwrResetHandler()
 {
