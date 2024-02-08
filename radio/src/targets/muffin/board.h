@@ -289,7 +289,7 @@ From Kconfig
 #define POT2_ADC_CHANNEL ADC_CHANNEL_4  // GPIO 5
 #define BATT_ADC_CHANNEL ADC_CHANNEL_6  // GPIO 7
 
-#define BACKLITE_PIN 4
+#define BACKLITE_PIN 3
 #define RMT_TX_PIN 41
 #define TRAINER_IN_GPIO 42
 #define FLYSKY_UART_RX_PIN 44
@@ -302,10 +302,13 @@ From Kconfig
 
 #define SD_DEDICATED_SPI
 #ifdef SD_DEDICATED_SPI
-#define SD_SPI_HOST SPI2_HOST
-#define SDSPI_CLK 47
-#define SDSPI_MOSI 0
-#define SDSPI_MISO 15
+#define SD_SPI_HOST SPI3_HOST
+
+//Available pins: 21
+//SD pins 38, 12, 10, 8
+#define SDSPI_CLK 12
+#define SDSPI_MOSI 10
+#define SDSPI_MISO 8
 #endif
 #define SDCARD_CS_GPIO 38
 
@@ -857,23 +860,14 @@ void fsLedOn(uint8_t);
 #endif
 
 // LCD driver
-#if defined(USE_OLED_FEATHERWING)
-#define LCD_W                           128
-#define LCD_H                           64
-#define LCD_DEPTH                       1
-void lcdRefresh(bool wait=true); // TODO uint8_t wait to simplify this
-#else
-#if !defined(CONFIG_LV_TFT_DISPLAY_CONTROLLER_RA8875)
 #define LCD_W                           480
 #define LCD_H                           320
-#else
-#define LCD_W                           480
-#define LCD_H                           272
-#endif
+
 #define LCD_DEPTH                       16
+
 void lcdRefresh();
 bool touchPanelInit(void);
-#endif
+
 #define IS_LCD_RESET_NEEDED()           true
 #define LCD_CONTRAST_MIN                10
 #define LCD_CONTRAST_MAX                30

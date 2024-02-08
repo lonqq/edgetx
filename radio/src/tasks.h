@@ -26,12 +26,14 @@
 
 // stack sizes should be in multiples of 8 for better alignment
 #if defined (COLORLCD)
-  #define MENUS_STACK_SIZE     20000
+  #define MENUS_STACK_SIZE     24 * 1024
 #else
-  #define MENUS_STACK_SIZE     8000
+  #define MENUS_STACK_SIZE     2000
 #endif
-#define MIXER_STACK_SIZE       8000
-#define AUDIO_STACK_SIZE       8000
+
+#define MIXER_STACK_SIZE       8 * 1024
+#define AUDIO_STACK_SIZE       8 * 1024
+
 #define CLI_STACK_SIZE         1024  // only consumed with CLI build option
 #if defined(ESP_PLATFORM)
 #define MIXER_TASK_PRIO        (tskIDLE_PRIORITY + 4)

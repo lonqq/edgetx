@@ -184,7 +184,7 @@ static void task_adc(void * pdata) {
     ESP_ERROR_CHECK(adc_continuous_deinit(handle));
 }
 
-#define TASKADC_STACK_SIZE (1024 * 4)
+#define TASKADC_STACK_SIZE (128 * 4)
 #define TASKADC_PRIO 5
 
 static RTOS_TASK_HANDLE taskIdADC;

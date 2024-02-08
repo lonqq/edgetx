@@ -101,6 +101,8 @@ class Layout: public LayoutBase
     // Updates settings for trims, sliders, pots, etc...
     void adjustLayout() override;
 
+    bool isLayout() override { return true; }
+
   protected:
     const LayoutFactory * factory  = nullptr;
     std::unique_ptr<ViewMainDecoration> decoration;

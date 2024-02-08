@@ -85,12 +85,12 @@ STATIC_LZ4_BITMAP(LBM_TOPMENU_TXBATT);
 STATIC_LZ4_BITMAP(LBM_TOPMENU_TXBATT_CHARGING);
 STATIC_LZ4_BITMAP(LBM_TOPMENU_ANTENNA);
 
-TopbarImpl::TopbarImpl(Window * parent) :
-  TopbarImplBase(parent, {0, 0, LCD_W, MENU_HEADER_HEIGHT}, &g_model.topbarData)
+TopBar::TopBar(Window * parent) :
+  TopBarBase(parent, {0, 0, LCD_W, MENU_HEADER_HEIGHT}, &g_model.topbarData)
 {
 }
 
-unsigned int TopbarImpl::getZonesCount() const
+unsigned int TopBar::getZonesCount() const
 {
 #if defined(INTERNAL_GPS)
   if (hasSerialMode(UART_MODE_GPS) != -1) {
@@ -100,7 +100,7 @@ unsigned int TopbarImpl::getZonesCount() const
   return MAX_TOPBAR_ZONES;
 }
 
-rect_t TopbarImpl::getZone(unsigned int index) const
+rect_t TopBar::getZone(unsigned int index) const
 {
   return {
     coord_t(49 + (TOPBAR_ZONE_WIDTH + 2 * TOPBAR_ZONE_MARGIN) * index),
@@ -110,7 +110,7 @@ rect_t TopbarImpl::getZone(unsigned int index) const
   };
 }
 
-void TopbarImpl::setVisible(float visible) // 0.0 -> 1.0
+void TopBar::setVisible(float visible) // 0.0 -> 1.0
 {
   if (visible == 0.0) {
     setTop(-(int)MENU_HEADER_HEIGHT);
@@ -124,7 +124,7 @@ void TopbarImpl::setVisible(float visible) // 0.0 -> 1.0
   }
 }
 
-coord_t TopbarImpl::getVisibleHeight(float visible) const // 0.0 -> 1.0
+coord_t TopBar::getVisibleHeight(float visible) const // 0.0 -> 1.0
 {
   if (visible == 0.0) {
     return 0;
@@ -137,7 +137,7 @@ coord_t TopbarImpl::getVisibleHeight(float visible) const // 0.0 -> 1.0
   return (coord_t)h;
 }
 
-void TopbarImpl::paint(BitmapBuffer * dc)
+void TopBar::paint(BitmapBuffer * dc)
 {
   dc->drawSolidFilledRect(0, 0, width(), height(), COLOR_THEME_SECONDARY1);
   OpenTxTheme::instance()->drawTopLeftBitmap(dc);
@@ -273,7 +273,7 @@ void TopbarImpl::paint(BitmapBuffer * dc)
 #endif
 }
 
-void TopbarImpl::checkEvents()
+void TopBar::checkEvents()
 {
   uint32_t now = RTOS_GET_MS();
   if (now - lastRefresh >= TOPBAR_REFRESH) {

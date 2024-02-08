@@ -71,6 +71,8 @@ const etx_hal_adc_driver_t* etx_hal_adc_driver = nullptr;
   const int8_t adcDirection[NUM_ANALOGS] = {-1,1,-1,1,  1,1,  1};
 #elif defined(PCBXLITE)
   const int8_t adcDirection[NUM_ANALOGS] = {1,-1,-1,1,  -1,1,  1,  1};
+#elif defined(PCB_MUFFIN)
+  const int8_t adcDirection[NUM_ANALOGS] = {-1, 1, 1, -1, -1, 1, 1, 1};
 #elif defined(PCBNV14)
   const uint8_t adcMapping[NUM_ANALOGS] = { 0 /*STICK1*/, 1 /*STICK2*/, 2 /*STICK3*/, 3 /*STICK4*/,
                                             4 /*POT1*/, 5 /*POT2*/, 6 /*SWA*/, 14 /*SWB*/,
@@ -262,7 +264,7 @@ void getADC()
 
   DEBUG_TIMER_START(debugTimerAdcRead);
   if (!adcRead())
-      TRACE("adcRead failed");
+      //TRACE("adcRead failed");
   DEBUG_TIMER_STOP(debugTimerAdcRead);
 
   for (uint8_t x=0; x<NUM_ANALOGS; x++) {

@@ -76,7 +76,7 @@ void audioSetCurrentBuffer(const AudioBuffer * buffer)
 }
 
 
-EXT_RAM_BSS_ATTR static uint8_t zero[2048] = {0};
+EXT_RAM_BSS_ATTR static uint8_t zero[128] = {0};
 
 void audioConsumeCurrentBuffer() {
   if (!currentBuffer) {

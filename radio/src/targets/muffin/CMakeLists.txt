@@ -6,6 +6,8 @@ option(INTERNAL_MODULE_PPM "Support for PPM internal module" OFF)
 option(AUTOUPDATE "Auto update internal chips from SD" OFF)
 
 set(EXTERNAL_MODULE YES)
+set(INTERNAL_MODULE NO)
+
 add_definitions(-DHARDWARE_TRIMS)
 add_definitions(-DFLYSKY_HALL_GIMBAL)
 
@@ -39,7 +41,7 @@ set(CROSSFIRE ON)
 add_definitions(-DREQUIRED_SDCARD_VERSION="${SDCARD_VERSION}" -DHAPTIC -DCROSSFIRE -DBOLD_FONT) # TODO-feather
 add_definitions(-DLUA_INPUTS -DTIMERS -DSOFTWARE_VOLUME) # TODO-feather
 add_definitions(-DPWR_BUTTON_${PWR_BUTTON})
-option(INTERNAL_MODULE_MULTI "Support for MULTI internal module" ON)
+option(INTERNAL_MODULE_MULTI "Support for MULTI internal module" OFF)
 option(INTERNAL_MODULE_ELRS "Support for ELRS internal module" OFF)
 option(INTERNAL_MODULE_ESPNOW "Support for ESPNOW internal module" ON)
 option(INTERNAL_MODULE_BT_POWERUP "Support for Bluetooth internal module for POWERUP" ON)
@@ -58,7 +60,7 @@ set(SBUS ON)
 add_definitions(-DDEBUG)
 set(AUX_SERIAL_DRIVER aux_serial_driver.cpp)
 
-add_definitions(-DRADIO_ZORRO)
+#add_definitions(-DRADIO_ZORRO)
 add_definitions(-DEEPROM_VARIANT=0x4006)
 add_definitions(-DMANUFACTURER_RADIOMASTER)
 
@@ -268,8 +270,6 @@ set(TARGET_SRC
   ${TARGET_SRC}
   ${LED_DRIVER}
   ${AUX_SERIAL_DRIVER}
-  top_lcd_driver.cpp
-  sh1107.cpp
   i2c_driver.cpp
   trainer_driver.cpp
   ${LCD_DRIVER}

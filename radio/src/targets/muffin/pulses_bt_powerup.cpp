@@ -31,7 +31,7 @@ extern "C" {
   extern TaskHandle_t pwrup_task_handle;
 }
 
-#define TASKPWRUP_STACK_SIZE (1024 * 4)
+#define TASKPWRUP_STACK_SIZE (1024 * 2)
 #define TASKPWRUP_PRIO 5
 
 static RTOS_TASK_HANDLE taskIdPWRUP;

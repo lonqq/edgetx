@@ -1793,6 +1793,7 @@ void opentxInit()
 
 #if defined(COLORLCD)
   loadTheme();
+  TRACE("LoadTheme finished in main");
   if (g_eeGeneral.backlightMode == e_backlight_mode_off) {
     // no backlight mode off on color lcd radios
     g_eeGeneral.backlightMode = e_backlight_mode_keys;

@@ -162,6 +162,7 @@ static RTOS_MUTEX_HANDLE ioMutex;
 void sdInit(void)
 {
   if (!card_present) {
+    config.max_freq_khz = 10000;
 #ifdef SD_DEDICATED_SPI
     spi_bus_config_t bus_config = {
         .mosi_io_num = SDSPI_MOSI,

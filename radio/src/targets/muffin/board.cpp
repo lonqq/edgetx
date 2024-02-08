@@ -19,6 +19,7 @@
  */
 
 #include "opentx.h"
+#include "esp_log.h"
 
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -129,9 +130,11 @@ void boardInit()
   flysky_hall_stick_init();
   init2MhzTimer();
   init5msTimer();
-  adruino_adc_init();
+  //adruino_adc_init();
 
-  toplcdInit();
+  //toplcdInit();
+
+  ESP_LOGI("Board", "Init finished");
 }
 
 void boardOff()

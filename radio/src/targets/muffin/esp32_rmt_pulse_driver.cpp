@@ -87,10 +87,11 @@ static bool rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done
 
 rmt_ctx_t *esp32_rmt_rx_init(rmt_ctx_t *ctxmem, int pin, rmt_reserve_memsize_t memsize, float tick_in_ns, rmt_rx_decode_cb_t dec_fn, size_t pulse_in_frame, size_t idle_threshold_in_ns, size_t min_pulse_in_ns) {
     rmt_ctx_t *rvalue = ctxmem;
+#if 0
 
     if (NULL != rvalue) {
         rmt_rx_channel_config_t rx_channel_cfg = {
-            .gpio_num = pin,
+            .gpio_num = (gpio_num_t)pin,
             .clk_src = RMT_CLK_SRC_DEFAULT,
             .resolution_hz = (uint32_t)(1000000000 / tick_in_ns),
             .mem_block_symbols = memsize, // amount of RMT symbols that the channel can store at a time
@@ -114,6 +115,8 @@ rmt_ctx_t *esp32_rmt_rx_init(rmt_ctx_t *ctxmem, int pin, rmt_reserve_memsize_t m
             rvalue = NULL;
         }
     }
+
+#endif
     return rvalue;
 }
 

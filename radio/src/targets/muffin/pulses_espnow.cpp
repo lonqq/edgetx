@@ -133,9 +133,9 @@ inline void process_bind(Event_t &evt) {
 static void tx_task(void *pvParameter)
 {
   Event_t evt;
-  //vTaskDelay(5000 / portTICK_RATE_MS);
+  //vTaskDelay(5000 / portTICK_PERIOD_MS);
   while (pulsesON) {
-    if(xQueueReceive(evtQueue, &evt, TX_PERIOD_MS/portTICK_RATE_MS) == pdTRUE) {
+    if(xQueueReceive(evtQueue, &evt, TX_PERIOD_MS/portTICK_PERIOD_MS) == pdTRUE) {
       switch (evt.id) {
         case TX:
             ESP_LOGD(TAG, "TX: evt.status: %d", evt.status);

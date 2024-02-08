@@ -59,6 +59,9 @@ pixel_t *LCD_SECOND_FRAME_BUFFER;
 BitmapBuffer * lcd = NULL;
 #endif
 
+static lv_area_t screen_area = {
+    0, 0, LCD_W-1, LCD_H-1
+};
 
 extern BitmapBuffer * lcdFront;
 extern BitmapBuffer * lcd;
@@ -136,11 +139,7 @@ void lcdInitDisplayDriver()
     // allow drawing at any moment
     _lv_refr_set_disp_refreshing(disp);
 
-#if defined(ESP_PLATFORM)
-  //lcdFront = new BitmapBuffer(BMP_RGB565, LCD_W, LCD_H);
-  lcd = new BitmapBuffer(BMP_RGB565, LCD_W, LCD_H,
-      (uint16_t *)malloc(align32(LCD_W * LCD_H * sizeof(uint16_t))));
-#endif
+  lcd = new BitmapBuffer(BMP_RGB565, LCD_W, LCD_H);
 
   lv_indev_drv_init(&indev_drv);
   indev_drv.read_cb = touch_driver_read;
@@ -165,6 +164,12 @@ void lcdRefresh() {
 }
 
 void lcdInitDirectDrawing() {
+    lv_draw_ctx_t* draw_ctx = disp->driver->draw_ctx;
+  draw_ctx->buf = disp->driver->draw_buf->buf_act;
+  draw_ctx->buf_area = &screen_area;
+  draw_ctx->clip_area = &screen_area;
+  lcd->setData((pixel_t*)draw_ctx->buf);
+  lcd->reset();
 }
 
 /*

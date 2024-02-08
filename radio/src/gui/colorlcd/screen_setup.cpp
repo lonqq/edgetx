@@ -223,9 +223,9 @@ void ScreenSetupPage::build(FormWindow * form)
   auto idx = customScreenIndex;
 
   LayoutChoice::LayoutFactoryGetter getFactory = [idx] () -> const LayoutFactory * {
-    auto layout = dynamic_cast<Layout*>(customScreens[idx]);
-    if (!layout) return nullptr;
-    return layout->getFactory();
+    auto layout = customScreens[idx];
+    if (!layout->isLayout()) return nullptr;
+    return ((Layout*)layout)->getFactory();
   };
 
   LayoutChoice::LayoutFactorySetter setLayout =
@@ -295,10 +295,10 @@ void ScreenSetupPage::buildLayoutOptions()
   layoutOptions->setFlexLayout();
   
   // Layout options...
-  auto layout = dynamic_cast<Layout*>(customScreens[customScreenIndex]);
-  if (!layout) return;
+  auto layout = customScreens[customScreenIndex];
+  if (!layout->isLayout()) return;
 
-  auto factory = layout->getFactory();
+  auto factory = ((Layout*)layout)->getFactory();
   if (!factory) return;
 
   int index = 0;

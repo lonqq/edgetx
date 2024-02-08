@@ -84,7 +84,7 @@ ViewMain::ViewMain():
   lv_obj_add_event_cb(lvobj, ViewMain::long_pressed, LV_EVENT_LONG_PRESSED, nullptr);
   
   // create last to be on top
-  topbar = dynamic_cast<TopbarImpl*>(TopbarFactory::create(this));
+  topbar = TopbarFactory::create(this);
 }
 
 ViewMain::~ViewMain()
@@ -103,10 +103,8 @@ void ViewMain::addMainView(Window* view, uint32_t viewId)
   TRACE("addMainView(0x%p, %d)", view, viewId);
 
   auto tile = lv_tileview_add_tile(tile_view, viewId, 0, LV_DIR_LEFT | LV_DIR_RIGHT);
-
   auto view_obj = view->getLvObj();
   lv_obj_set_parent(view_obj, tile);
-
   auto user_data = (void*)(intptr_t)viewId;
   lv_obj_add_event_cb(tile, tile_view_deleted_cb, LV_EVENT_CHILD_DELETED, user_data);
 }
@@ -167,7 +165,7 @@ void ViewMain::previousMainView()
   saveViewId(view);
 }
 
-Topbar* ViewMain::getTopbar()
+TopBar* ViewMain::getTopbar()
 {
   return topbar;
 }
