@@ -255,7 +255,7 @@
   #define HARDWARE_EXTERNAL_MODULE_SIZE_SML
   #define EXTERNAL_MODULE_PWR_ON()      // TODO-feather
   #define EXTERNAL_MODULE_PWR_OFF()     // TODO-feather
-  #define IS_EXTERNAL_MODULE_ON()       false // TODO-feather
+  #define IS_EXTERNAL_MODULE_ON()       true // TODO-feather
   #define EXTMODULE_TX_GPIO             GPIOC
   #define EXTMODULE_USART_GPIO          EXTMODULE_TX_GPIO
   #define EXTMODULE_TX_GPIO_PIN         GPIO_Pin_6  // PC.06

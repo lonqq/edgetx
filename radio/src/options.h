@@ -77,6 +77,9 @@ static const char * const options[] = {
 #if defined(MULTIMODULE)
   "multimodule",
 #endif
+#if defined(HARDWARE_EXTERNAL_MODULE)
+  "externalmodule",
+#endif
 #if defined(LUA_MODEL_SCRIPTS)
   "lua",
 #endif

@@ -161,13 +161,8 @@ bool IS_INTERNAL_MODULE_ON(void);
   #define HARDWARE_INTERNAL_RAS
 #endif
 
-#define EXTERNAL_MODULE_ON()            EXTERNAL_MODULE_PWR_ON()
-
-#if defined(EXTMODULE_USART)
-  #define EXTERNAL_MODULE_OFF()         EXTERNAL_MODULE_PWR_OFF()
-#else
-  #define EXTERNAL_MODULE_OFF()         EXTERNAL_MODULE_PWR_OFF()
-#endif
+void EXTERNAL_MODULE_ON(void);
+void EXTERNAL_MODULE_OFF(void);
 
 void intmoduleSerialStart(uint32_t baudrate, uint8_t rxEnable, uint16_t parity, uint16_t stopBits, uint16_t wordLength);
 #if defined(INTERNAL_MODULE_MULTI)
@@ -292,7 +287,7 @@ From Kconfig
 #define BACKLITE_PIN 3
 #define RMT_TX_PIN 41
 #define TRAINER_IN_GPIO 42
-#define FLYSKY_UART_RX_PIN 44
+#define FLYSKY_UART_RX_PIN -1
 
 #define INTMOD_UART_PORT UART_NUM_2
 #define INTMOD_RX_PIN 2
@@ -304,7 +299,6 @@ From Kconfig
 #ifdef SD_DEDICATED_SPI
 #define SD_SPI_HOST SPI3_HOST
 
-//Available pins: 21
 //SD pins 38, 12, 10, 8
 #define SDSPI_CLK 12
 #define SDSPI_MOSI 10

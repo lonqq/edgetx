@@ -4,9 +4,12 @@ option(AFHDS3 "AFHDS3 TX Module" OFF)
 option(GHOST "Ghost TX Module" OFF)
 option(INTERNAL_MODULE_PPM "Support for PPM internal module" OFF)
 option(AUTOUPDATE "Auto update internal chips from SD" OFF)
+option(MULTIMODULE "DIY Multiprotocol TX Module (https://github.com/pascallanger/DIY-Multiprotocol-TX-Module)" ON)
+option(CROSSFIRE "Crossfire TX Module" ON)
 
 set(EXTERNAL_MODULE YES)
 set(INTERNAL_MODULE NO)
+set(HARDWARE_EXTERNAL_MODULE YES)
 
 add_definitions(-DHARDWARE_TRIMS)
 add_definitions(-DFLYSKY_HALL_GIMBAL)
@@ -333,15 +336,11 @@ if(INTERNAL_MODULE_PPM)
   add_definitions(-DINTERNAL_MODULE_PPM)
 endif()
 
-if(INTERNAL_MODULE_ELRS)
-  add_definitions(-DHARDWARE_INTERNAL_MODULE)
-  add_definitions(-DINTERNAL_MODULE_ELRS)
-endif()
-
 if(EXTERNAL_MODULE)
   set(TARGET_SRC
     ${TARGET_SRC}
     extmodule_driver.cpp
+    extmodule_serial_driver.cpp
     )
   add_definitions(-DHARDWARE_EXTERNAL_MODULE)
 endif()

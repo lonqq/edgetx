@@ -20,6 +20,7 @@
 
 #include "opentx.h"
 #include "esp_log.h"
+#include "esp_debug_helpers.h"
 
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -127,7 +128,7 @@ void boardInit()
 
   initWiFi();
 
-  flysky_hall_stick_init();
+  //flysky_hall_stick_init();
   init2MhzTimer();
   init5msTimer();
   //adruino_adc_init();
@@ -192,3 +193,17 @@ bool isVBatBridgeEnabled() {
 #ifndef ESP_PLATFORM
 void NVIC_SystemReset(void) {}
 #endif
+void EXTERNAL_MODULE_ON()
+{
+  EXTERNAL_MODULE_PWR_ON()
+  ESP_LOGI("Board", "External Module on");
+  esp_backtrace_print(10);
+
+}
+
+void EXTERNAL_MODULE_OFF()
+{
+  EXTERNAL_MODULE_PWR_OFF()
+  ESP_LOGI("Board", "External Module off");
+
+}
