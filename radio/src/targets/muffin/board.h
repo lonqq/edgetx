@@ -289,6 +289,9 @@ From Kconfig
 #define TRAINER_IN_GPIO 42
 #define FLYSKY_UART_RX_PIN -1
 
+#define EXTTEL_UART_PORT UART_NUM_2
+#define EXTTEL_PIN 1
+
 #define INTMOD_UART_PORT UART_NUM_2
 #define INTMOD_RX_PIN 2
 #define INTMOD_TX_PIN 1
@@ -908,9 +911,9 @@ void setTopBatteryValue(uint32_t volts);
 //#include "dmafifo.h"
 
 #if defined(CROSSFIRE)
-#define TELEMETRY_FIFO_SIZE             128
+#define TELEMETRY_FIFO_SIZE             512
 #else
-#define TELEMETRY_FIFO_SIZE             64
+#define TELEMETRY_FIFO_SIZE             256
 #endif
 
 extern Fifo<uint8_t, TELEMETRY_FIFO_SIZE> telemetryFifo;
