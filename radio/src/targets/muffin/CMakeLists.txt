@@ -6,6 +6,8 @@ option(INTERNAL_MODULE_PPM "Support for PPM internal module" OFF)
 option(AUTOUPDATE "Auto update internal chips from SD" OFF)
 option(MULTIMODULE "DIY Multiprotocol TX Module (https://github.com/pascallanger/DIY-Multiprotocol-TX-Module)" ON)
 option(CROSSFIRE "Crossfire TX Module" ON)
+option(LUA_COMPILER "Pre-compile and save Lua scripts" ON)
+
 
 set(EXTERNAL_MODULE YES)
 set(INTERNAL_MODULE NO)
@@ -340,7 +342,6 @@ if(EXTERNAL_MODULE)
   set(TARGET_SRC
     ${TARGET_SRC}
     extmodule_driver.cpp
-    extmodule_serial_driver.cpp
     )
   add_definitions(-DHARDWARE_EXTERNAL_MODULE)
 endif()

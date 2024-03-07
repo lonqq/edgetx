@@ -197,8 +197,7 @@ void EXTERNAL_MODULE_ON()
 {
   EXTERNAL_MODULE_PWR_ON()
   ESP_LOGI("Board", "External Module on");
-  esp_backtrace_print(10);
-
+  //esp_backtrace_print(10);
 }
 
 void EXTERNAL_MODULE_OFF()

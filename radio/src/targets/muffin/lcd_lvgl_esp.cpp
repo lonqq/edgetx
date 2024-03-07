@@ -32,6 +32,7 @@ extern "C" {
 #include "freertos/semphr.h"
 #include "esp_system.h"
 #include "driver/gpio.h"
+#include "esp_log.h"
 
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -55,7 +56,7 @@ extern uint32_t _ext_ram_bss_start;
 pixel_t *LCD_FIRST_FRAME_BUFFER;
 pixel_t *LCD_SECOND_FRAME_BUFFER;
 
-//BitmapBuffer * lcdFront = NULL;
+BitmapBuffer * lcdFront = NULL;
 BitmapBuffer * lcd = NULL;
 #endif
 
@@ -71,10 +72,77 @@ static lv_disp_draw_buf_t disp_buf;
 static lv_disp_t* disp = nullptr;
 static lv_indev_drv_t indev_drv;
 extern lv_color_t* lcdbuf;
+
+static lv_disp_drv_t* refr_disp = nullptr;
+
+void lcdRefreshFull(lv_disp_drv_t* drv, uint16_t* buffer, const rect_t& areaExt);
+
+static void flushLcd(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+{
+#if !defined(LCD_VERTICAL_INVERT)
+  // we're only interested in the last flush in direct mode
+  if (!lv_disp_flush_is_last(disp_drv)) {
+    lv_disp_flush_ready(disp_drv);
+    return;
+  }
+#endif
+  
+#if defined(DEBUG_WINDOWS)
+  if (area->x1 != 0 || area->x2 != LCD_W-1 || area->y1 != 0 ||
+      area->y2 != LCD_H-1) {
+    TRACE("partial refresh @ 0x%p {%d,%d,%d,%d}", color_p, area->x1,
+          area->y1, area->x2, area->y2);
+  } else {
+    TRACE("full refresh @ 0x%p", color_p);
+  }
+#endif
+
+  if (1) {
+    refr_disp = disp_drv;
+
+    rect_t copy_area = {area->x1, area->y1,
+                        area->x2 - area->x1 + 1,
+                        area->y2 - area->y1 + 1};
+
+    lcdRefreshFull(disp_drv, (uint16_t*)color_p, copy_area);
+
+#if !defined(LCD_VERTICAL_INVERT)
+    uint16_t* src = (uint16_t*)color_p;
+    uint16_t* dst = nullptr;
+    if ((uint16_t*)color_p == LCD_FIRST_FRAME_BUFFER)
+      dst = LCD_SECOND_FRAME_BUFFER;
+    else
+      dst = LCD_FIRST_FRAME_BUFFER;
+
+    lv_disp_t* disp = _lv_refr_get_disp_refreshing();
+    for(int i = 0; i < disp->inv_p; i++) {
+      if(disp->inv_area_joined[i]) continue;
+
+      const lv_area_t& refr_area = disp->inv_areas[i];
+
+      auto area_w = refr_area.x2 - refr_area.x1 + 1;
+      auto area_h = refr_area.y2 - refr_area.y1 + 1;
+
+      DMACopyBitmap(dst, LCD_W, LCD_H, refr_area.x1, refr_area.y1,
+                    src, LCD_W, LCD_H, refr_area.x1, refr_area.y1,
+                    area_w, area_h);      
+    }
+    
+    lv_disp_flush_ready(disp_drv);
+#endif
+  } else {
+    lv_disp_flush_ready(disp_drv);
+  }
+}
+
+void waitCb(_lv_disp_drv_t * disp_drv){
+  //disp_wait_for_pending_transactions();
+}
+
 void lcdInitDisplayDriver()
 {
 #if defined(CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9488)
-    lv_color_t* buf1 = (lv_color_t*)malloc(DISP_BUF_SIZE * sizeof(lv_color_t));
+    lv_color_t* buf1 = (lv_color_t*)heap_caps_aligned_alloc(16, DISPLAY_BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
 #else
     lv_color_t* buf1 = lcdbuf;
 #endif
@@ -83,7 +151,7 @@ void lcdInitDisplayDriver()
     /* Use double buffered when not working with monochrome displays */
 #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
 #if defined(CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9488)
-    lv_color_t* buf2 = (lv_color_t*)malloc(DISP_BUF_SIZE * sizeof(lv_color_t));
+    lv_color_t* buf2 = (lv_color_t*)heap_caps_aligned_alloc(16, DISPLAY_BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
 #else
     lv_color_t* buf2 = &lcdbuf[DISP_BUF_SIZE];
 #endif
@@ -92,8 +160,10 @@ void lcdInitDisplayDriver()
     static lv_color_t *buf2 = NULL;
 #endif
 
-    uint32_t size_in_px = DISP_BUF_SIZE;
+    memset(buf1, 0, DISPLAY_BUFFER_SIZE * sizeof(pixel_t));
+    memset(buf2, 0, DISPLAY_BUFFER_SIZE * sizeof(pixel_t));
 
+    uint32_t size_in_px = DISPLAY_BUFFER_SIZE;
 #if defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_IL3820         \
     || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_JD79653A    \
     || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_UC8151D     \
@@ -108,7 +178,8 @@ void lcdInitDisplayDriver()
     lv_disp_draw_buf_init(&disp_buf, buf1, buf2, size_in_px);
 
     lv_disp_drv_init(&disp_drv);
-    disp_drv.flush_cb = disp_driver_flush;
+    disp_drv.flush_cb = flushLcd;
+    //disp_drv.wait_cb = waitCb;
 
 #if defined CONFIG_DISPLAY_ORIENTATION_PORTRAIT || defined CONFIG_DISPLAY_ORIENTATION_PORTRAIT_INVERTED
     disp_drv.rotated = 1;
@@ -139,7 +210,12 @@ void lcdInitDisplayDriver()
     // allow drawing at any moment
     _lv_refr_set_disp_refreshing(disp);
 
-  lcd = new BitmapBuffer(BMP_RGB565, LCD_W, LCD_H);
+  lcd = new BitmapBuffer(BMP_RGB565, LCD_W, LCD_H, (uint16_t *)buf1);
+  lcdFront = new BitmapBuffer(BMP_RGB565, LCD_W, LCD_H, (uint16_t *)buf2);
+
+  lv_draw_ctx_t * draw_ctx = disp->driver->draw_ctx;
+  lcd->setDrawCtx(draw_ctx);
+  lcdFront->setDrawCtx(draw_ctx);
 
   lv_indev_drv_init(&indev_drv);
   indev_drv.read_cb = touch_driver_read;
@@ -147,20 +223,71 @@ void lcdInitDisplayDriver()
   lv_indev_drv_register(&indev_drv);
 }
 
-#define DISPBUF_LINES (DISP_BUF_SIZE / LV_HOR_RES_MAX)
-#define PIXEL_EACHBLOCK (LV_HOR_RES_MAX * DISPBUF_LINES)
-void lcdRefresh() {
-  lv_color_t *p = (lv_color_t *)lcd->getData();
-  lv_area_t area = {.x1 = 0, .y1 = 0, .x2 = LV_HOR_RES_MAX - 1, .y2 = DISPBUF_LINES - 1};
-  while (area.y2 < LV_VER_RES_MAX) {
-    int lines = LV_VER_RES_MAX - area.y1;
-    if (lines > DISPBUF_LINES) lines = DISPBUF_LINES;
+void lcdRefreshFull(lv_disp_drv_t* drv, uint16_t* buffer, const rect_t& rect) {
+  
+  lv_color_t *p = (lv_color_t *)buffer;
+  lv_coord_t maxLines = DISP_BUF_SIZE / rect.w;
+  lv_area_t area = {.x1 = (lv_coord_t)rect.x, .y1 = (lv_coord_t)rect.y, .x2 = (lv_coord_t)(rect.right() - 1), .y2 = (lv_coord_t)(rect.y + maxLines - 1)};
+  while (area.y1 < rect.bottom()) {
+    int lines = rect.bottom() - area.y1;
+    lines = LV_MIN(maxLines, lines);
+    area.y2 = area.y1 + lines - 1;
 
-    disp_drv.flush_cb(&disp_drv, &area, p);
+    disp_driver_flush(drv, &area, p);
     area.y1 += lines;
-    area.y2 += lines;
-    p += PIXEL_EACHBLOCK; // OK to be added pass the end at the end of drawing
+    p += rect.w * lines; // OK to be added pass the end at the end of drawing
   }
+}
+
+static void _call_flush_cb(lv_disp_drv_t* drv, const lv_area_t* area,
+                           lv_color_t* color_p)
+{
+  lv_area_t offset_area = {.x1 = (lv_coord_t)(area->x1 + drv->offset_x),
+                           .y1 = (lv_coord_t)(area->y1 + drv->offset_y),
+                           .x2 = (lv_coord_t)(area->x2 + drv->offset_x),
+                           .y2 = (lv_coord_t)(area->y2 + drv->offset_y)};
+
+  drv->flush_cb(drv, &offset_area, color_p);
+}
+
+static void _draw_buf_flush(lv_disp_t* disp)
+{
+  lv_disp_draw_buf_t* draw_buf = lv_disp_get_draw_buf(disp);
+
+  /*Flush the rendered content to the display*/
+  lv_draw_ctx_t* draw_ctx = disp->driver->draw_ctx;
+  if (draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
+
+  /* In double buffered mode wait until the other buffer is freed
+   * and driver is ready to receive the new buffer */
+  if (draw_buf->buf1 && draw_buf->buf2) {
+    while (draw_buf->flushing) {
+      if (disp->driver->wait_cb)
+        disp->driver->wait_cb(disp->driver);
+    }
+  }
+
+  draw_buf->flushing = 1;
+  draw_buf->flushing_last = 1;
+
+  if (disp->driver->flush_cb) {
+    _call_flush_cb(disp->driver, draw_ctx->buf_area,
+                   (lv_color_t*)draw_ctx->buf);
+  }
+
+  /*If there are 2 buffers swap them. */
+  if (draw_buf->buf1 && draw_buf->buf2) {
+    if (draw_buf->buf_act == draw_buf->buf1)
+      draw_buf->buf_act = draw_buf->buf2;
+    else
+      draw_buf->buf_act = draw_buf->buf1;
+  }
+}
+
+void lcdRefresh()
+{
+  _draw_buf_flush(disp);
+  lv_disp_flush_ready(disp->driver);
 }
 
 void lcdInitDirectDrawing() {
@@ -276,4 +403,12 @@ void DMACopyAlphaMask(uint16_t *dest, uint16_t destw, uint16_t desth,
       q++;
     }
   }
+}
+
+void lcdFlushed()
+{
+  // its possible to get here before flushLcd is ever called.
+  // so check for nullptr first. (Race condition if you put breakpoints in startup code)
+  if (refr_disp != nullptr)
+    lv_disp_flush_ready(refr_disp);
 }
