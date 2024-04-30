@@ -19,7 +19,7 @@
 #include <time.h>
 #include <string.h>
 #include <assert.h>
-#include "config.h"
+//#include "config.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/timers.h"

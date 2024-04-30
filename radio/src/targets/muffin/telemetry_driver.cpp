@@ -24,7 +24,6 @@
 #include "rom/gpio.h"
 #include "esp_log.h"
 #include "soc/gpio_sig_map.h"
-
 #define uartIn U2RXD_IN_IDX
 #define uartOut U2TXD_OUT_IDX
 
@@ -32,11 +31,19 @@
 Fifo<uint8_t, TELEMETRY_FIFO_SIZE> telemetryFifo;
 uint32_t telemetryErrors = 0;
 uint8_t inputInverted = 1;
+static RTOS_MUTEX_HANDLE telemetryMutex;
 
 void telemetryPortInitCommon(uint32_t baudrate, uint8_t mode, uint8_t inverted = 0)
 {
+    RTOS_LOCK_MUTEX(telemetryMutex);
     ESP_LOGI("Telem", "Init uart with baudrate %d, inverted? %d", baudrate, inverted);
-    uart_driver_delete(EXTTEL_UART_PORT);
+
+    if(uart_is_driver_installed(EXTTEL_UART_PORT))
+    {
+      uart_driver_delete(EXTTEL_UART_PORT);
+      // wait for removal
+      vTaskDelay(200 / portTICK_RATE_MS);
+    }
     //inputInverted = inverted;
     uart_config_t uart_config = {
         .baud_rate = (int)baudrate,      //ELRS_INTERNAL_BAUDRATE
@@ -57,9 +64,11 @@ void telemetryPortInitCommon(uint32_t baudrate, uint8_t mode, uint8_t inverted =
   }
 
   // We won't use a buffer for sending data.
-  uart_driver_install(EXTTEL_UART_PORT, TELEMETRY_FIFO_SIZE, 0, 0, NULL, 0);
+  uart_driver_install(EXTTEL_UART_PORT, TELEMETRY_FIFO_SIZE * 2, 0, 0, NULL, 0);
+
   uart_param_config(EXTTEL_UART_PORT, &uart_config);
   uart_set_pin(EXTTEL_UART_PORT, EXTTEL_PIN, EXTTEL_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+  RTOS_UNLOCK_MUTEX(telemetryMutex);
 
 }
 
@@ -73,15 +82,27 @@ void telemetryPortInvertedInit(uint32_t baudrate)
   telemetryPortInitCommon(baudrate, TELEMETRY_SERIAL_DEFAULT, 1);
 }
 
+void telemetryBaseInit()
+{
+  RTOS_CREATE_MUTEX(telemetryMutex);
+  telemetryPortInitCommon(ELRS_INTERNAL_BAUDRATE, TELEMETRY_SERIAL_DEFAULT, 0);
+}
+
 void IRAM_ATTR telemetryPortSetDirectionOutput()
 {
   // Read all data
   // todo: move it to event/interrupt
   uint8_t data;
   int i = 0;
-  while(uart_read_bytes(EXTTEL_UART_PORT, &data, 1, 0)){
+  int bytes = 0;
+  while((bytes = uart_read_bytes(EXTTEL_UART_PORT, &data, 1, 0))){
     telemetryFifo.push(data);
     i++;
+  }
+  if(bytes < 0)
+  {
+    ESP_LOGE("Telem", "Error while reading data");
+    vTaskDelay(200 / portTICK_RATE_MS);
   }
   if(i >= TELEMETRY_FIFO_SIZE){
     ESP_LOGI("Telem", "Read data %d", i); 

@@ -30,6 +30,7 @@
 #endif
 
 #include "lvgl_helpers.h"
+#include "i2c_driver.h"
 
 #include "nvs_flash.h"
 /* BLE */
@@ -115,10 +116,11 @@ void boardInit()
 #if !defined(CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9488)
   lcdbuf = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t) * 2, MALLOC_CAP_DMA);
 #endif
+  telemetryBaseInit();
+  i2c_master_init();
 
   lv_init();
   lvgl_driver_init(&disp_drv); // lvgl driver initializes I2C_0 as well.
-
   keysInit();
 
   sdInit();
@@ -131,8 +133,7 @@ void boardInit()
   //flysky_hall_stick_init();
   init2MhzTimer();
   init5msTimer();
-  //adruino_adc_init();
-
+  adruino_adc_init();
   //toplcdInit();
 
   ESP_LOGI("Board", "Init finished");

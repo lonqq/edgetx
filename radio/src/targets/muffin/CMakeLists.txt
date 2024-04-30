@@ -10,7 +10,7 @@ option(LUA_COMPILER "Pre-compile and save Lua scripts" ON)
 
 
 set(EXTERNAL_MODULE YES)
-set(INTERNAL_MODULE NO)
+set(INTERNAL_MODULE YES)
 set(HARDWARE_EXTERNAL_MODULE YES)
 
 add_definitions(-DHARDWARE_TRIMS)
@@ -46,7 +46,7 @@ set(CROSSFIRE ON)
 add_definitions(-DREQUIRED_SDCARD_VERSION="${SDCARD_VERSION}" -DHAPTIC -DCROSSFIRE -DBOLD_FONT) # TODO-feather
 add_definitions(-DLUA_INPUTS -DTIMERS -DSOFTWARE_VOLUME) # TODO-feather
 add_definitions(-DPWR_BUTTON_${PWR_BUTTON})
-option(INTERNAL_MODULE_MULTI "Support for MULTI internal module" OFF)
+option(INTERNAL_MODULE_MULTI "Support for MULTI internal module" ON)
 option(INTERNAL_MODULE_ELRS "Support for ELRS internal module" OFF)
 option(INTERNAL_MODULE_ESPNOW "Support for ESPNOW internal module" ON)
 option(INTERNAL_MODULE_BT_POWERUP "Support for Bluetooth internal module for POWERUP" ON)
@@ -57,7 +57,7 @@ set(LINKER_SCRIPT targets/muffin/ldscript.ld)
 set(FIRMWARE_TARGET_SRC
   ${FIRMWARE_TARGET_SRC}
   )
-set(ROTARY_ENCODER YES)
+set(ROTARY_ENCODER NO)
 set(LUA_EXPORT lua_export_muffin)
 set(BLUETOOTH NO)
 set(USB_CHARGER YES)
@@ -222,7 +222,9 @@ set(GUI_SRC
   )
 else()
 if (MULTIMODULE)
+  add_definitions(-DMULTIMODULE)
   add_definitions(-DMULTI_PROTOLIST)
+  add_definitions(-DDSM2)
     set(SRC ${SRC}
       io/multi_protolist.cpp
   )
@@ -265,6 +267,7 @@ if(DSM2)
 endif()
 
 if(SBUS)
+  add_definitions(-DSBUS)
   set(PULSES_SRC
     ${PULSES_SRC}
     sbus.cpp

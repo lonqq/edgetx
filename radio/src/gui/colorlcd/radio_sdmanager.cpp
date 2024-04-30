@@ -367,6 +367,7 @@ void RadioSdManagerPage::fileAction(const char* path, const char* name,
                                   CLIPBOARD_PATH_LEN);
           destNamePtr = destFileName;
         }
+#pragma GCC diagnostic ignored "-Wdangling-pointer="
         sdCopyFile(clipboard.data.sd.filename, clipboard.data.sd.directory,
                    destNamePtr, lfn);
         clipboard.type = CLIPBOARD_TYPE_NONE;

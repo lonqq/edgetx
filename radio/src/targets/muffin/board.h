@@ -249,28 +249,21 @@ void check_intmodule_heartbeat();
 
 void check_telemetry_exti();
 
-#define KEYS_GPIO_REG_MENU
-#define KEYS_GPIO_REG_ENTER
-#define KEYS_GPIO_REG_UP
-#define KEYS_GPIO_REG_DOWN
-#define KEYS_GPIO_REG_EXIT
-
-#define TMR_5MS_CORE 0
-#define TRAINER_PPM_OUT_TASK_CORE 0
-#define MIXER_TASK_CORE 0
+#define TMR_5MS_CORE 1
+#define TRAINER_PPM_OUT_TASK_CORE 1
+#define MIXER_TASK_CORE 1
 #define PULSES_TASK_CORE 0
 #define MENU_TASK_CORE 1
 #define AUDIO_TASK_CORE 1
 
+#define I2C_SCL 40
+#define I2C_SDA 39
 /*
 From Kconfig
   LCD D0 - D7: 14, 13, 12, 11, 10, 9, 46, 3
   LCD CS 45
   LCD DC 48
   LCD WR 21
-
-#define I2C_SCL 40
-#define I2C_SDA 39
 
 //  MOSI -1
 //  MISO -1
@@ -318,18 +311,15 @@ From Kconfig
 enum EnumKeys
 {
   KEY_ENTER,
-  KEY_MENU = KEY_ENTER,
   KEY_EXIT,
-  KEY_UP,   // must match the order of the button above
-  KEY_PLUS = KEY_UP,
+  KEY_PGUP,
+  KEY_PGDN,
+  KEY_UP,
   KEY_DOWN,
-  KEY_MINUS = KEY_DOWN,
-  BUTTONS_ON_GPIOA = KEY_DOWN,
-  KEY_RIGHT,
   KEY_LEFT,
+  KEY_RIGHT,
+  KEY_MODEL,
   KEY_RADIO,
-  BUTTONS_ON_MCP1 = KEY_RADIO,
-  KEY_BIND,
   KEY_TELEM,
 
   KEY_COUNT,
@@ -348,16 +338,25 @@ enum EnumKeys
 
   NUM_KEYS
 };
+#define KEY_MINUS                     KEY_DOWN
+#define KEY_PLUS                      KEY_UP
+#define KEY_RADIO                     KEY_RIGHT
+
+//#define KEYS_GPIO_REG_MENU
+#define KEYS_GPIO_REG_ENTER
+// #define KEYS_GPIO_REG_UP
+// #define KEYS_GPIO_REG_DOWN
+#define KEYS_GPIO_REG_EXIT
 
 #define KEYS_GPIO_REG_PGUP
 #define KEYS_GPIO_REG_PGDN
 
-#if defined(COLORLCD)
-  #define KEY_RADIO                     KEY_RIGHT
-  #define KEY_MODEL                     KEY_ENTER
-  #define KEY_PGUP                      KEY_UP
-  #define KEY_PGDN                      KEY_DOWN
-#endif
+// #if defined(COLORLCD)
+//   #define KEY_RADIO                     KEY_RIGHT
+//   #define KEY_MODEL                     KEY_ENTER
+//   #define KEY_PGUP                      KEY_RIGHT
+//   #define KEY_PGDN                      KEY_LEFT
+// #endif
 
 #if defined(KEYS_GPIO_PIN_SHIFT)
 #define IS_SHIFT_KEY(index)             (index == KEY_SHIFT)
@@ -703,6 +702,7 @@ void eepromBlockErase(uint32_t address);
 void debugPutc(const char c);
 
 // Telemetry driver
+void telemetryBaseInit();
 void telemetryPortInit(uint32_t baudrate, uint8_t mode);
 void telemetryPortSetDirectionInput();
 void telemetryPortSetDirectionOutput();

@@ -213,7 +213,7 @@ static void _seekStart(uint8_t* buffer, uint8_t* len)
 static void crossfireProcessData(void* context, uint8_t data, uint8_t* buffer, uint8_t* len)
 {
   if (*len == 0 && data != RADIO_ADDRESS && data != UART_SYNC) {
-    TRACE("[XF] address 0x%02X error", data);
+    TRACE("[XF] address 0x%02X error, data len %d", data, *len);
     return;
   }
 

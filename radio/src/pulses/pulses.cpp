@@ -106,9 +106,11 @@ void restartModule(uint8_t idx)
   pauseMixerCalculations();
   pausePulses();
 
+#if defined(HARDWARE_INTERNAL_MODULE)
   if (idx == INTERNAL_MODULE) stopPulsesInternalModule();
+#endif
 #if defined(HARDWARE_EXTERNAL_MODULE)
-  else stopPulsesExternalModule();
+  if (idx == EXTERNAL_MODULE) stopPulsesExternalModule();
 #endif
 
   RTOS_WAIT_MS(200); // 20ms so that the pulses interrupt will reinit the frame rate
@@ -779,13 +781,14 @@ void extmoduleSendNextFrame()
           extmodulePulsesData.dsm2.pulses,
           extmodulePulsesData.dsm2.ptr - extmodulePulsesData.dsm2.pulses);
       break;
-#endif
+
     case PROTOCOL_CHANNELS_DSMP:
       extmoduleSendNextFrameSoftSerial(
           extmodulePulsesData.dsm2.pulses,
           extmodulePulsesData.dsm2.ptr - extmodulePulsesData.dsm2.pulses,
           true);
       break;
+#endif
 
 #if defined(GHOST)
     case PROTOCOL_CHANNELS_GHOST:
