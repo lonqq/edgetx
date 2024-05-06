@@ -82,8 +82,9 @@ void rotaryEncoderCheck();
 #define BOOTLOADER_SIZE                 0x8000
 #define FIRMWARE_ADDRESS                0x08000000
 
-#define LUA_MEM_EXTRA_MAX               (0)    // max allowed memory usage for Lua bitmaps (in bytes)
-#define LUA_MEM_MAX                     (0)    // max allowed memory usage for complete Lua  (in bytes), 0 means unlimited
+#define MB                             *1024*1024
+#define LUA_MEM_EXTRA_MAX              (2 MB)    // max allowed memory usage for Lua bitmaps (in bytes)
+#define LUA_MEM_MAX                    (4 MB)    // max allowed memory usage for complete Lua  (in bytes), 0 means unlimited
 
 #if defined(STM32F4)
   #define PERI1_FREQUENCY               42000000
@@ -252,7 +253,7 @@ void check_telemetry_exti();
 #define TMR_5MS_CORE 1
 #define TRAINER_PPM_OUT_TASK_CORE 1
 #define MIXER_TASK_CORE 1
-#define PULSES_TASK_CORE 0
+#define PULSES_TASK_CORE 1
 #define MENU_TASK_CORE 1
 #define AUDIO_TASK_CORE 1
 
@@ -310,17 +311,13 @@ From Kconfig
 // on Adafruit_MCP23X17
 enum EnumKeys
 {
+  KEY_MENU,
   KEY_ENTER,
   KEY_EXIT,
-  KEY_PGUP,
-  KEY_PGDN,
+
   KEY_UP,
   KEY_DOWN,
-  KEY_LEFT,
-  KEY_RIGHT,
-  KEY_MODEL,
-  KEY_RADIO,
-  KEY_TELEM,
+  KEY_PGDN,
 
   KEY_COUNT,
   KEY_MAX = KEY_COUNT - 1,
@@ -340,23 +337,15 @@ enum EnumKeys
 };
 #define KEY_MINUS                     KEY_DOWN
 #define KEY_PLUS                      KEY_UP
-#define KEY_RADIO                     KEY_RIGHT
+#define KEY_MODEL                     KEY_ENTER
+#define KEY_RADIO                     KEY_UP
+#define KEY_TELEM                     KEY_DOWN
 
-//#define KEYS_GPIO_REG_MENU
+// just to satisfy compiler...
+#define KEY_PGUP                      9000
+
 #define KEYS_GPIO_REG_ENTER
-// #define KEYS_GPIO_REG_UP
-// #define KEYS_GPIO_REG_DOWN
 #define KEYS_GPIO_REG_EXIT
-
-#define KEYS_GPIO_REG_PGUP
-#define KEYS_GPIO_REG_PGDN
-
-// #if defined(COLORLCD)
-//   #define KEY_RADIO                     KEY_RIGHT
-//   #define KEY_MODEL                     KEY_ENTER
-//   #define KEY_PGUP                      KEY_RIGHT
-//   #define KEY_PGDN                      KEY_LEFT
-// #endif
 
 #if defined(KEYS_GPIO_PIN_SHIFT)
 #define IS_SHIFT_KEY(index)             (index == KEY_SHIFT)
@@ -394,7 +383,7 @@ enum EnumSwitches
   SW_SR,
 };
 
-#define IS_3POS(x)                      ((x) == SW_SC)
+#define IS_3POS(x)                      ((x) == SW_SC || (x) == SW_SD)
 
 enum EnumSwitchesPositions
 {
@@ -427,7 +416,7 @@ enum EnumSwitchesPositions
 
   #define NUM_SWITCHES                  8
   #define STORAGE_NUM_SWITCHES          NUM_SWITCHES
-  #define DEFAULT_SWITCH_CONFIG         (SWITCH_NONE << 14) + (SWITCH_NONE << 12) + (SWITCH_NONE << 10) + (SWITCH_NONE << 8) + (SWITCH_2POS << 6) + (SWITCH_3POS << 4) + (SWITCH_2POS << 2) + (SWITCH_2POS << 0)
+  #define DEFAULT_SWITCH_CONFIG         (SWITCH_NONE << 14) + (SWITCH_NONE << 12) + (SWITCH_TOGGLE << 10) + (SWITCH_TOGGLE << 8) + (SWITCH_3POS << 6) + (SWITCH_3POS << 4) + (SWITCH_2POS << 2) + (SWITCH_2POS << 0)
   #define DEFAULT_POTS_CONFIG           (POT_WITHOUT_DETENT << 0) + (POT_WITHOUT_DETENT << 2);
 
 #if !defined(NUM_FUNCTIONS_SWITCHES)

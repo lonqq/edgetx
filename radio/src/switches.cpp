@@ -218,7 +218,9 @@ void getSwitchesPosition(bool startup)
   CHECK_2POS(SW_SA);
   CHECK_2POS(SW_SB);
   CHECK_3POS(0, SW_SC);
-  CHECK_2POS(SW_SD);
+  CHECK_3POS(1, SW_SD);
+  CHECK_2POS(SW_SE);
+  CHECK_2POS(SW_SF);
 #else
 #if defined(RADIO_TX12) || defined(RADIO_TX12MK2) || defined(RADIO_ZORRO) || defined(RADIO_BOXER)
   CHECK_2POS(SW_SA);
