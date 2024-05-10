@@ -7,6 +7,7 @@ option(AUTOUPDATE "Auto update internal chips from SD" OFF)
 option(MULTIMODULE "DIY Multiprotocol TX Module (https://github.com/pascallanger/DIY-Multiprotocol-TX-Module)" ON)
 option(CROSSFIRE "Crossfire TX Module" ON)
 option(LUA_COMPILER "Pre-compile and save Lua scripts" ON)
+option(ADS_ADC "External ADC(ADS1115) for sticks" ON)
 
 
 set(EXTERNAL_MODULE YES)
@@ -14,7 +15,7 @@ set(INTERNAL_MODULE YES)
 set(HARDWARE_EXTERNAL_MODULE YES)
 
 add_definitions(-DHARDWARE_TRIMS)
-add_definitions(-DFLYSKY_HALL_GIMBAL)
+#add_definitions(-DFLYSKY_HALL_GIMBAL)
 
 set(PWR_BUTTON "SWITCH" CACHE STRING "Pwr button type (PRESS/SWITCH)")
 set(HAPTIC YES)
@@ -339,6 +340,14 @@ include_directories(${RADIO_SRC_DIR}/targets/${TARGET_DIR}/ftp-server gui/${GUI_
 if(INTERNAL_MODULE_PPM)
   add_definitions(-DHARDWARE_INTERNAL_MODULE)
   add_definitions(-DINTERNAL_MODULE_PPM)
+endif()
+
+if(ADS_ADC)
+  set(TARGET_SRC
+    ${TARGET_SRC}
+    adc_ads1115_driver.cpp
+  )
+  add_definitions(-DEXTERNAL_ADC_ADS)
 endif()
 
 if(EXTERNAL_MODULE)

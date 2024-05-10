@@ -440,6 +440,10 @@ uint8_t getFSPhysicalState(uint8_t index);
 #define TRIMS_PRESSED()                 (readTrims())
 #define KEYS_PRESSED()                  (readKeys())
 
+#if defined(EXTERNAL_ADC_ADS)
+void adsStartConversion();
+#endif
+
 // WDT driver
 #define WDG_DURATION                      500 /*ms*/
   #define WDG_ENABLE(x) // TODO-feather

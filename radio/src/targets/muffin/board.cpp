@@ -134,6 +134,9 @@ void boardInit()
   init2MhzTimer();
   init5msTimer();
   adruino_adc_init();
+#if defined(EXTERNAL_ADC_ADS)
+  adsStartConversion();
+#endif
   //toplcdInit();
 
   ESP_LOGI("Board", "Init finished");
