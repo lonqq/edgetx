@@ -296,10 +296,10 @@ From Kconfig
 #ifdef SD_DEDICATED_SPI
 #define SD_SPI_HOST SPI3_HOST
 
-//SD pins 38, 12, 10, 8
-#define SDSPI_CLK 12
+//SD pins 38, 47, 10, 21
+#define SDSPI_CLK 47
 #define SDSPI_MOSI 10
-#define SDSPI_MISO 8
+#define SDSPI_MISO 21
 #endif
 #define SDCARD_CS_GPIO 38
 
